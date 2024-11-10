@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jenot</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/img/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/img/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/img/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+
+  <body>
+    <div id="content">
+      <h1>Jenot</h1>
+
+      <div class="note">
+        <editable-area>example note</editable-area>
+      </div>
+
+      <div class="note">
+        <task-list>
+          <ul>
+            <li><task-list-item checked>one</task-list-item></li>
+            <li><task-list-item>two</task-list-item></li>
+          </ul>
+        </task-list>
+      </div>
+    </div>
+
+    <template id="task-list-item">
+      <div class="handle"><button>||</button></div>
+      <div class="checkbox"><input type="checkbox" /></div>
+      <editable-area></editable-area>
+      <div class="remove"><button>X</button></div>
+    </template>
+
+    <script src="/js/jenot.js"></script>
+  </body>
+</html>

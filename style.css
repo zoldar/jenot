@@ -1,0 +1,150 @@
+/* CSS reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+p {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+#root,
+#__next {
+  isolation: isolate;
+}
+
+/* Editable area component */
+
+editable-area {
+  display: block;
+  position: relative;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  text-indent: inherit;
+  letter-spacing: inherit;
+  width: 100%;
+}
+
+editable-area .display {
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  text-indent: inherit;
+  letter-spacing: inherit;
+  padding: 0;
+  margin: 0;
+  border-width: 0;
+}
+
+editable-area textarea {
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  -webkit-text-fill-color: transparent;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  border: none;
+  resize: none;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  text-indent: inherit;
+  letter-spacing: inherit;
+  padding: 0;
+  margin: 0;
+  border-width: 0;
+}
+
+editable-area textarea:focus {
+  outline: none;
+}
+
+/* Task list */
+
+task-list ul {
+  wdith: 100%;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+task-list-item {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+task-list-item .checkbox input {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* Styles */
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #222;
+}
+
+div#content {
+  width: 270px;
+  max-width: 1200px;
+  margin: 10px auto 0 auto;
+}
+
+.note {
+  max-width: 240px;
+  background: beige;
+  box-shadow: 2px 2px 4px 0px rgb(0 0 0 / 0.8);
+  padding: 4px 8px;
+  margin-bottom: 20px;
+}
