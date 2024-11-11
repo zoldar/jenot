@@ -88,7 +88,7 @@ editable-area textarea {
   top: 0;
   left: 0;
   -webkit-text-fill-color: transparent;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
   border: none;
@@ -123,13 +123,28 @@ task-list-item {
   margin-bottom: 4px;
 }
 
+task-list-item .handle button {
+  cursor: grab;
+}
+
 task-list-item .checkbox input {
   width: 1.1em;
   height: 1.1em;
 }
 
-.dragging {
+li.dragging {
   opacity: 0.5;
+  cursor: grabbing;
+}
+
+.drag-placeholder {
+  opacity: 0.5;
+  background-color: beige;
+}
+
+.draggable,
+task-list ul {
+  touch-action: none;
 }
 
 /* Styles */

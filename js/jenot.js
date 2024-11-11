@@ -113,6 +113,7 @@ class TaskListItem extends HTMLElement {
       this.appendChild(child.cloneNode(true));
     });
 
+    this.taskList = this.closest("task-list");
     this.handleElement = this.querySelector(".handle");
     this.checkboxElement = this.querySelector(".checkbox input");
     this.contentElement = this.querySelector("editable-area");
@@ -161,6 +162,68 @@ class TaskListItem extends HTMLElement {
       this.parentNode.classList.remove("dragging");
     });
 
+    this.parentNode.addEventListener("touchstart", (e) => {
+      if (e.target.closest("div").classList.contains("handle")) {
+        this.parentNode.classList.add("dragging");
+        this.taskList.dragActiveElement = this.parentNode;
+        if (!this.taskList.dragPlaceholder) {
+          this.taskList.dragPlaceholder = document.createElement("div");
+          this.taskList.dragPlaceholder.classList.add("drag-placeholder");
+          this.taskList.dragPlaceholder.textContent = ">";
+        }
+
+        e.preventDefault();
+      }
+    });
+
+    const taskListUL = this.taskList.querySelector("ul");
+
+    this.parentNode.addEventListener("touchmove", (e) => {
+      if (this.taskList.dragActiveElement) {
+        const touch = e.touches[0];
+        this.parentNode.style.position = "absolute";
+        this.parentNode.style.left = `${touch.clientX}px`;
+        this.parentNode.style.top = `${touch.clientY}px`;
+        this.parentNode.style.width = "240px";
+
+        if (this.taskList.dragPlaceholder) {
+          const afterElement = getDragAfterElement(taskListUL, touch.clientY);
+          if (afterElement) {
+            taskListUL.insertBefore(
+              this.taskList.dragPlaceholder,
+              afterElement,
+            );
+          } else {
+            taskListUL.appendChild(this.taskList.dragPlaceholder);
+          }
+        }
+        e.preventDefault();
+      }
+    });
+
+    this.parentNode.addEventListener("touchend", () => {
+      if (this.taskList.dragActiveElement) {
+        this.parentNode.classList.remove("dragging");
+        if (
+          this.taskList.dragActiveElement &&
+          this.taskList.dragPlaceholder &&
+          this.taskList.dragPlaceholder.parentNode
+        ) {
+          this.taskList.dragPlaceholder.parentNode.insertBefore(
+            this.taskList.dragActiveElement,
+            this.taskList.dragPlaceholder,
+          );
+          this.taskList.dragPlaceholder.remove();
+          this.taskList.dragActiveElement.style.position = "static";
+          this.taskList.dragActiveElement.style.left = "";
+          this.taskList.dragActiveElement.style.top = "";
+          this.taskList.dragActiveElement.style.width = "";
+        }
+        this.taskList.dragActiveElement = null;
+        this.taskList.dragPlaceholder = null;
+      }
+    });
+
     this.#updateChecked();
   }
 
@@ -205,6 +268,9 @@ class TaskListItem extends HTMLElement {
 customElements.define("task-list-item", TaskListItem);
 
 class TaskList extends HTMLElement {
+  dragPlaceholder = null;
+  dragActiveElement = null;
+
   constructor() {
     super();
   }
@@ -278,7 +344,7 @@ class TaskList extends HTMLElement {
     this.listElement.addEventListener("dragover", (e) => {
       e.preventDefault();
 
-      const afterElement = this.#getDragAfterElement(e.clientY);
+      const afterElement = getDragAfterElement(this.listElement, e.clientY);
       const draggable = document.querySelector(".dragging");
 
       if (afterElement == null) {
@@ -288,26 +354,26 @@ class TaskList extends HTMLElement {
       }
     });
   }
+}
 
-  #getDragAfterElement(y) {
-    const draggableElements = [
-      ...this.listElement.querySelectorAll("li:not(.dragging)"),
-    ];
+function getDragAfterElement(container, y) {
+  const draggableElements = [
+    ...container.querySelectorAll("li:not(.dragging)"),
+  ];
 
-    return draggableElements.reduce(
-      (closest, containerChild) => {
-        const box = containerChild.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
+  return draggableElements.reduce(
+    (closest, containerChild) => {
+      const box = containerChild.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
 
-        if (offset < 0 && offset > closest.offset) {
-          return { offset: offset, element: containerChild };
-        } else {
-          return closest;
-        }
-      },
-      { offset: Number.NEGATIVE_INFINITY },
-    ).element;
-  }
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: containerChild };
+      } else {
+        return closest;
+      }
+    },
+    { offset: Number.NEGATIVE_INFINITY },
+  ).element;
 }
 
 customElements.define("task-list", TaskList);
