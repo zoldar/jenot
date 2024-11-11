@@ -151,7 +151,22 @@ class TaskListItem extends HTMLElement {
       }
     });
 
+    // drag and drop events
+
+    this.parentNode.addEventListener("dragstart", (e) => {
+      this.parentNode.classList.add("dragging");
+    });
+
+    this.parentNode.addEventListener("dragend", () => {
+      this.parentNode.classList.remove("dragging");
+    });
+
     this.#updateChecked();
+  }
+
+  disconnectedCallback() {
+    this.textContent = this.contentElement.value;
+    this.setAttribute("checked", this.checkboxElement.checked);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -195,11 +210,14 @@ class TaskList extends HTMLElement {
   }
 
   connectedCallback() {
+    this.listElement = this.querySelector("ul");
+
     this.addEventListener("removeTaskWithButton", (e) => {
       const tasksCount = this.querySelectorAll("task-list-item").length;
 
       if (tasksCount === 1) {
         const newLI = document.createElement("li");
+        newLI.setAttribute("draggable", "true");
         const newItem = document.createElement("task-list-item");
         newLI.appendChild(newItem);
         this.querySelector("ul").appendChild(newLI);
@@ -228,6 +246,7 @@ class TaskList extends HTMLElement {
       const currentLI = e.target.parentNode;
 
       const newLI = document.createElement("li");
+      newLI.setAttribute("draggable", "true");
       const newItem = document.createElement("task-list-item");
       newItem.textContent = text;
       newLI.appendChild(newItem);
@@ -254,6 +273,40 @@ class TaskList extends HTMLElement {
         prevItem.focusEnd();
       }
     });
+
+    // drag and drop
+    this.listElement.addEventListener("dragover", (e) => {
+      e.preventDefault();
+
+      const afterElement = this.#getDragAfterElement(e.clientY);
+      const draggable = document.querySelector(".dragging");
+
+      if (afterElement == null) {
+        this.listElement.appendChild(draggable);
+      } else {
+        this.listElement.insertBefore(draggable, afterElement);
+      }
+    });
+  }
+
+  #getDragAfterElement(y) {
+    const draggableElements = [
+      ...this.listElement.querySelectorAll("li:not(.dragging)"),
+    ];
+
+    return draggableElements.reduce(
+      (closest, containerChild) => {
+        const box = containerChild.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: containerChild };
+        } else {
+          return closest;
+        }
+      },
+      { offset: Number.NEGATIVE_INFINITY },
+    ).element;
   }
 }
 

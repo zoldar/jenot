@@ -23,6 +23,7 @@
       href="/img/favicon-16x16.png"
     />
     <link rel="manifest" href="/site.webmanifest" />
+    <script src="/js/jenot.js" defer></script>
   </head>
 
   <body>
@@ -36,8 +37,8 @@
       <div class="note">
         <task-list>
           <ul>
-            <li><task-list-item checked>one</task-list-item></li>
-            <li><task-list-item>two</task-list-item></li>
+            <li draggable="true"><task-list-item checked>one</task-list-item></li>
+            <li draggable="true"><task-list-item>two</task-list-item></li>
           </ul>
         </task-list>
       </div>
@@ -49,7 +50,5 @@
       <editable-area></editable-area>
       <div class="remove"><button>X</button></div>
     </template>
-
-    <script src="/js/jenot.js"></script>
   </body>
 </html>
