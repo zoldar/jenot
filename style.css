@@ -167,3 +167,17 @@ div#content {
   padding: 4px 8px;
   margin-bottom: 20px;
 }
+
+.note.readonly ul {
+  wdith: 100%;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.note.readonly ul li {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}

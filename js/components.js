@@ -83,13 +83,13 @@ class EditableArea extends HTMLElement {
   }
 
   #sync() {
-    this.displayElement.innerHTML = render(this.inputElement.value);
+    this.displayElement.innerHTML = renderText(this.inputElement.value);
     this.inputElement.style.height = this.displayElement.scrollHeight + "px";
     this.inputElement.style.width = this.displayElement.scrollWidth + "px";
   }
 }
 
-function render(text) {
+export function renderText(text) {
   return text.replace(/(?:\r\n|\r|\n)/g, "<br>") + "<br>";
 }
 
