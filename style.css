@@ -147,6 +147,18 @@ task-list ul {
   touch-action: none;
 }
 
+/* Note form */
+
+note-form .content {
+  min-height: 2.5em;
+}
+
+note-form .note {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* Styles */
 
 * {
@@ -180,4 +192,8 @@ div#content {
   gap: 6px;
   align-items: baseline;
   margin-bottom: 4px;
+}
+
+.hidden {
+  display: none;
 }

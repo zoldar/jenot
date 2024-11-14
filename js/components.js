@@ -1,3 +1,4 @@
+import { renderText, html } from "./dom.js";
 
 // editable-area component
 
@@ -10,15 +11,16 @@ class EditableArea extends HTMLElement {
 
   connectedCallback() {
     const text = this.textContent;
-    this.textContent = "";
     this.displayElement = document.createElement("p", { class: "display" });
     this.inputElement = document.createElement("textarea");
     this.inputElement.value = text;
 
-    this.appendChild(this.displayElement);
-    this.appendChild(this.inputElement);
+    this.replaceChildren(this.displayElement, this.inputElement);
 
-    this.inputElement.addEventListener("input", () => this.#sync());
+    this.inputElement.addEventListener("input", (e) => {
+      this.dispatchEvent(new Event("contentChange", { bubbles: true }));
+      this.#sync();
+    });
 
     this.#updateReadonly();
     this.#sync();
@@ -83,19 +85,15 @@ class EditableArea extends HTMLElement {
   }
 
   #sync() {
-    this.displayElement.innerHTML = renderText(this.inputElement.value);
+    this.displayElement.replaceChildren(...renderText(this.inputElement.value));
     this.inputElement.style.height = this.displayElement.scrollHeight + "px";
     this.inputElement.style.width = this.displayElement.scrollWidth + "px";
   }
 }
 
-export function renderText(text) {
-  return text.replace(/(?:\r\n|\r|\n)/g, "<br>") + "<br>";
-}
-
 customElements.define("editable-area", EditableArea);
 
-// task-list component
+// task-list-item component
 
 class TaskListItem extends HTMLElement {
   static observedAttributes = ["checked"];
@@ -120,6 +118,8 @@ class TaskListItem extends HTMLElement {
     this.contentElement = this.querySelector("editable-area");
     this.contentElement.value = text;
     this.removeButton = this.querySelector(".remove button");
+
+    this.handleElement.addEventListener("click", (e) => e.preventDefault());
 
     this.removeButton.addEventListener("click", (e) => {
       this.dispatchEvent(new Event("removeTaskWithButton", { bubbles: true }));
@@ -153,6 +153,10 @@ class TaskListItem extends HTMLElement {
       }
     });
 
+    this.checkboxElement.addEventListener("change", () =>
+      this.dispatchEvent(new Event("contentChange", { bubbles: true })),
+    );
+
     // drag and drop events
 
     this.parentNode.addEventListener("dragstart", (e) => {
@@ -161,6 +165,7 @@ class TaskListItem extends HTMLElement {
 
     this.parentNode.addEventListener("dragend", () => {
       this.parentNode.classList.remove("dragging");
+      this.dispatchEvent(new Event("contentChange", { bubbles: true }));
     });
 
     this.parentNode.addEventListener("touchstart", (e) => {
@@ -226,6 +231,7 @@ class TaskListItem extends HTMLElement {
     });
 
     this.#updateChecked();
+    this.dispatchEvent(new Event("contentChange", { bubbles: true }));
   }
 
   disconnectedCallback() {
@@ -250,6 +256,11 @@ class TaskListItem extends HTMLElement {
     };
   }
 
+  set value(item) {
+    this.checkboxElement.checked = item.checked;
+    this.contentElement.value = item.content;
+  }
+
   focusStart() {
     this.contentElement.focusStart();
   }
@@ -267,6 +278,8 @@ class TaskListItem extends HTMLElement {
 }
 
 customElements.define("task-list-item", TaskListItem);
+
+// task-list component
 
 class TaskList extends HTMLElement {
   dragPlaceholder = null;
@@ -293,6 +306,8 @@ class TaskList extends HTMLElement {
 
       const currentLI = e.target.parentNode;
       currentLI.remove();
+
+      this.dispatchEvent(new Event("contentChange", { bubbles: true }));
     });
 
     this.addEventListener("removeTask", (e) => {
@@ -305,6 +320,7 @@ class TaskList extends HTMLElement {
         previousItem.focusEnd();
         previousItem.append(textToAppend);
         currentLI.remove();
+        this.dispatchEvent(new Event("contentChange", { bubbles: true }));
       }
     });
 
@@ -319,6 +335,7 @@ class TaskList extends HTMLElement {
       newLI.appendChild(newItem);
       currentLI.after(newLI);
       newItem.focusStart();
+      this.dispatchEvent(new Event("contentChange", { bubbles: true }));
     });
 
     this.addEventListener("moveToNextTask", (e) => {
@@ -355,6 +372,26 @@ class TaskList extends HTMLElement {
       }
     });
   }
+
+  get value() {
+    return Array.from(this.querySelectorAll("task-list-item")).map(
+      (item) => item.value,
+    );
+  }
+
+  set value(tasks) {
+    this.listElement.replaceChildren();
+
+    tasks.forEach((task) => {
+      const item = html`
+        <li draggable="true"><task-list-item></task-list-itm></li>
+        `;
+      this.listElement.appendChild(item);
+      item.querySelector("task-list-item").value = task;
+    });
+
+    this.dispatchEvent(new Event("contentChange", { bubbles: true }));
+  }
 }
 
 function getDragAfterElement(container, y) {
@@ -378,3 +415,105 @@ function getDragAfterElement(container, y) {
 }
 
 customElements.define("task-list", TaskList);
+
+// note-form component
+
+function convertToTaskList(note) {
+  return note.split("\n").map((line) => {
+    return { checked: false, content: line };
+  });
+}
+
+function convertToNote(tasks) {
+  const lines = tasks.map((task) => task.content);
+  return lines.join("\n");
+}
+
+const contentMap = {
+  note_string: (s) => s,
+  note_object: convertToNote,
+  tasklist_object: (s) => s,
+  tasklist_string: convertToTaskList,
+};
+
+class NoteForm extends HTMLElement {
+  constructor() {
+    super();
+
+    this.note = {
+      type: "note",
+      content: "",
+    };
+  }
+
+  connectedCallback() {
+    this.content = this.querySelector(".content");
+    this.tasklistModeButton = this.querySelector(".tasklist-mode");
+    this.noteModeButton = this.querySelector(".note-mode");
+    this.removeButton = this.querySelector(".remove");
+
+    this.tasklistModeButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.note.type = "tasklist";
+      this.#setContent();
+      this.#updateUI();
+    });
+
+    this.noteModeButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.note.type = "note";
+      this.#setContent();
+      this.#updateUI();
+    });
+
+    this.removeButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.#reset();
+    });
+
+    this.addEventListener("contentChange", () => {
+      this.note.content = this.content.firstChild.value;
+    });
+
+    this.#updateUI();
+    this.#setContent();
+  }
+
+  #reset() {
+    this.note = {
+      type: "note",
+      content: "",
+    };
+
+    this.#updateUI();
+    this.#setContent();
+  }
+
+  #updateUI() {
+    if (this.note.type === "note") {
+      this.tasklistModeButton.classList.remove("hidden");
+      this.noteModeButton.classList.add("hidden");
+    } else {
+      this.tasklistModeButton.classList.add("hidden");
+      this.noteModeButton.classList.remove("hidden");
+    }
+  }
+
+  #setContent() {
+    const contentFun =
+      contentMap[`${this.note.type}_${typeof this.note.content}`];
+    this.note.content = contentFun(this.note.content);
+
+    if (this.note.type === "note") {
+      const note = html`<editable-area></editable-area>`;
+      this.content.replaceChildren(note);
+      note.value = this.note.content;
+    } else {
+      const taskList = html`<task-list><ul></ul></task-list>`;
+      this.content.replaceChildren(taskList);
+      taskList.value = this.note.content;
+    }
+  }
+}
+
+customElements.define("note-form", NoteForm);

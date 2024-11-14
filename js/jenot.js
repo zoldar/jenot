@@ -1,7 +1,10 @@
-import { renderText } from "./components.js";
+import { renderText } from "./dom.js";
 import { NoteStore } from "./store.js";
+import "./components.js"
 
 const Notes = new NoteStore("jenot-app");
+
+const newNote = document.querySelector("#new-note");
 
 Notes.addEventListener("save", render.bind(this));
 
@@ -26,7 +29,6 @@ Notes.saveStorage();
 function render() {
   const notes = Notes.all();
   const notesContainer = document.querySelector("#notes");
-  notesContainer.textContent = "";
 
   notes.forEach((note) => {
     const container = document.createElement("div");
@@ -35,7 +37,7 @@ function render() {
     container.classList.add("readonly");
 
     if (note.type === "note") {
-      container.innerHTML = renderText(note.content);
+      container.replaceChildren(...renderText(note.content));
     } else if (note.type === "tasklist") {
       const list = document.createElement("ul");
 
@@ -45,7 +47,7 @@ function render() {
         check.textContent = task.checked ? "☑" : "☐";
         item.appendChild(check);
         const itemContent = document.createElement("p");
-        itemContent.innerHTML = renderText(task.content);
+        itemContent.replaceChildren(...renderText(task.content));
         item.appendChild(itemContent);
         list.append(item);
       });
@@ -53,6 +55,6 @@ function render() {
       container.appendChild(list);
     }
 
-    notesContainer.appendChild(container);
+    notesContainer.replaceChildren(container);
   });
 }
