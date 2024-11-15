@@ -451,6 +451,7 @@ class NoteForm extends HTMLElement {
     this.tasklistModeButton = this.querySelector(".tasklist-mode");
     this.noteModeButton = this.querySelector(".note-mode");
     this.removeButton = this.querySelector(".remove");
+    this.addButton = this.querySelector(".add");
 
     this.tasklistModeButton.addEventListener("click", (e) => {
       e.preventDefault();
@@ -468,6 +469,17 @@ class NoteForm extends HTMLElement {
 
     this.removeButton.addEventListener("click", (e) => {
       e.preventDefault();
+      this.#reset();
+    });
+
+    this.addButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.dispatchEvent(
+        new CustomEvent("addNote", {
+          bubbles: true,
+          detail: this.note,
+        }),
+      );
       this.#reset();
     });
 

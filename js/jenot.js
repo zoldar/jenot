@@ -1,6 +1,6 @@
 import { renderText } from "./dom.js";
 import { NoteStore } from "./store.js";
-import "./components.js"
+import "./components.js";
 
 const Notes = new NoteStore("jenot-app");
 
@@ -8,27 +8,18 @@ const newNote = document.querySelector("#new-note");
 
 Notes.addEventListener("save", render.bind(this));
 
-Notes.reset();
+render();
 
-Notes.add({
-  type: "note",
-  content: "This is a test note",
+newNote.addEventListener("addNote", (e) => {
+  Notes.add(e.detail);
+  Notes.saveStorage();
 });
-
-Notes.add({
-  type: "tasklist",
-  content: [
-    { checked: false, content: "First item" },
-    { checked: true, content: "Second item" },
-    { checked: false, content: "Third item" },
-  ],
-});
-
-Notes.saveStorage();
 
 function render() {
   const notes = Notes.all();
+  console.log(notes)
   const notesContainer = document.querySelector("#notes");
+  notesContainer.replaceChildren();
 
   notes.forEach((note) => {
     const container = document.createElement("div");
@@ -55,6 +46,6 @@ function render() {
       container.appendChild(list);
     }
 
-    notesContainer.replaceChildren(container);
+    notesContainer.appendChild(container);
   });
 }
