@@ -1,3 +1,4 @@
+import "./service-worker.js";
 import { renderText } from "./dom.js";
 import { NoteStore } from "./store.js";
 import "./components.js";
