@@ -167,13 +167,13 @@ note-form .note {
 }
 
 div#content {
-  width: 270px;
+  /* width: 270px; */
   max-width: 1200px;
   margin: 10px auto 0 auto;
 }
 
 .note {
-  max-width: 240px;
+  /* min-width: 240px; */
   background: beige;
   box-shadow: 2px 2px 4px 0px rgb(0 0 0 / 0.8);
   padding: 4px 8px;

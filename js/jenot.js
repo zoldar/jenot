@@ -5,19 +5,34 @@ import "./components.js";
 const Notes = new NoteStore("jenot-app");
 
 const newNote = document.querySelector("#new-note");
+const editNote = document.querySelector("#edit-note");
 
 Notes.addEventListener("save", render.bind(this));
 
 render();
 
 newNote.addEventListener("addNote", (e) => {
+  console.log(e.detail);
   Notes.add(e.detail);
+  Notes.saveStorage();
+});
+
+editNote.addEventListener("updateNote", (e) => {
+  newNote.classList.remove("hidden");
+  editNote.classList.add("hidden");
+  Notes.update(e.detail);
+  Notes.saveStorage();
+});
+
+editNote.addEventListener("deleteNote", (e) => {
+  newNote.classList.remove("hidden");
+  editNote.classList.add("hidden");
+  Notes.remove(e.detail);
   Notes.saveStorage();
 });
 
 function render() {
   const notes = Notes.all();
-  console.log(notes)
   const notesContainer = document.querySelector("#notes");
   notesContainer.replaceChildren();
 
@@ -47,5 +62,11 @@ function render() {
     }
 
     notesContainer.appendChild(container);
+
+    container.addEventListener("click", (e) => {
+      newNote.classList.add("hidden");
+      editNote.classList.remove("hidden");
+      editNote.load(Notes.get(container.id));
+    });
   });
 }

@@ -30,7 +30,7 @@ export class NoteStore extends EventTarget {
   }
 
   all = () => this.notes;
-  get = () => this.notes.find((note) => note.id === id);
+  get = (id) => this.notes.find((note) => note.id === id);
   getEditedNoteId = () => this.editedNoteId;
 
   add(note) {

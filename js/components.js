@@ -447,11 +447,13 @@ class NoteForm extends HTMLElement {
   }
 
   connectedCallback() {
+    this.mode = this.attributes.mode.value;
     this.content = this.querySelector(".content");
     this.tasklistModeButton = this.querySelector(".tasklist-mode");
     this.noteModeButton = this.querySelector(".note-mode");
     this.removeButton = this.querySelector(".remove");
     this.addButton = this.querySelector(".add");
+    this.saveButton = this.querySelector(".save");
 
     this.tasklistModeButton.addEventListener("click", (e) => {
       e.preventDefault();
@@ -469,24 +471,51 @@ class NoteForm extends HTMLElement {
 
     this.removeButton.addEventListener("click", (e) => {
       e.preventDefault();
+      if (this.mode === "edit") {
+        this.dispatchEvent(
+          new CustomEvent("deleteNote", {
+            bubbles: true,
+            detail: this.note,
+          }),
+        );
+      }
       this.#reset();
     });
 
-    this.addButton.addEventListener("click", (e) => {
-      e.preventDefault();
-      this.dispatchEvent(
-        new CustomEvent("addNote", {
-          bubbles: true,
-          detail: this.note,
-        }),
-      );
-      this.#reset();
-    });
+    if (this.mode === "add") {
+      this.addButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.dispatchEvent(
+          new CustomEvent("addNote", {
+            bubbles: true,
+            detail: this.note,
+          }),
+        );
+        this.#reset();
+      });
+    } else {
+      this.saveButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.dispatchEvent(
+          new CustomEvent("updateNote", {
+            bubbles: true,
+            detail: this.note,
+          }),
+        );
+        this.#reset();
+      });
+    }
 
     this.addEventListener("contentChange", () => {
       this.note.content = this.content.firstChild.value;
     });
 
+    this.#updateUI();
+    this.#setContent();
+  }
+
+  load(note) {
+    this.note = note;
     this.#updateUI();
     this.#setContent();
   }

@@ -30,15 +30,28 @@
     <div id="content">
       <h1>Jenot</h1>
 
-      <note-form id="new-note">
+      <note-form mode="add" id="new-note">
         <div class="note">
           <p class="content">
           </p>
           <div class="toolbar">
+            <button class="add">➕</button>
             <button class="tasklist-mode">☑️</button>
             <button class="note-mode">📑</button>
             <button class="remove">🗑️</button>
-            <button class="add">➕</button>
+          </div>
+        </div>
+      </note-form>
+
+      <note-form mode="edit" id="edit-note" class="hidden">
+        <div class="note">
+          <p class="content">
+          </p>
+          <div class="toolbar">
+            <button class="save">💾</button>
+            <button class="tasklist-mode">☑️</button>
+            <button class="note-mode">📑</button>
+            <button class="remove">🗑️</button>
           </div>
         </div>
       </note-form>
