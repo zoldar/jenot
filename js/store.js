@@ -1,7 +1,6 @@
 export class NoteStore extends EventTarget {
   localStorageKey;
   notes = [];
-  editedNoteId = "none";
 
   /*
   Note structure:
@@ -31,7 +30,6 @@ export class NoteStore extends EventTarget {
 
   all = () => this.notes;
   get = (id) => this.notes.find((note) => note.id === id);
-  getEditedNoteId = () => this.editedNoteId;
 
   add(note) {
     this.notes.unshift({
@@ -54,18 +52,10 @@ export class NoteStore extends EventTarget {
     this.notes = this.notes.map((n) => (n.id === note.id ? note : n));
   }
 
-  setEditedNoteId(id) {
-    this.editedNoteId = id;
-  }
-
   saveStorage() {
     window.localStorage.setItem(
       this.localStorageKey + "_notes",
       JSON.stringify(this.notes),
-    );
-    window.localStorage.setItem(
-      this.localStorageKey + "_editedNoteId",
-      this.editedNoteId,
     );
     this.dispatchEvent(new CustomEvent("save"));
   }
@@ -74,8 +64,5 @@ export class NoteStore extends EventTarget {
     this.notes = JSON.parse(
       window.localStorage.getItem(this.localStorageKey + "_notes") || "[]",
     );
-    this.editedNoteId =
-      window.localStorage.getItem(this.localStorageKey + "_editedNoteId") ||
-      "none";
   }
 }

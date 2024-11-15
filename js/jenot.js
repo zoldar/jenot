@@ -1,9 +1,14 @@
 import "./service-worker.js";
 import { renderText } from "./dom.js";
 import { NoteStore } from "./store.js";
+import { DBNoteStore } from "./db-store.js";
 import "./components.js";
 
-const Notes = new NoteStore("jenot-app");
+const urlParams = new URLSearchParams(window.location.search);
+
+const Notes = urlParams.has("localStorage")
+  ? new NoteStore("jenot-app")
+  : new DBNoteStore("jenot-app", "notes");
 
 const newNote = document.querySelector("#new-note");
 const editNote = document.querySelector("#edit-note");
@@ -12,28 +17,27 @@ Notes.addEventListener("save", render.bind(this));
 
 render();
 
-newNote.addEventListener("addNote", (e) => {
-  console.log(e.detail);
-  Notes.add(e.detail);
+newNote.addEventListener("addNote", async (e) => {
+  await Notes.add(e.detail);
   Notes.saveStorage();
 });
 
-editNote.addEventListener("updateNote", (e) => {
+editNote.addEventListener("updateNote", async (e) => {
   newNote.classList.remove("hidden");
   editNote.classList.add("hidden");
-  Notes.update(e.detail);
+  await Notes.update(e.detail);
   Notes.saveStorage();
 });
 
-editNote.addEventListener("deleteNote", (e) => {
+editNote.addEventListener("deleteNote", async (e) => {
   newNote.classList.remove("hidden");
   editNote.classList.add("hidden");
-  Notes.remove(e.detail);
+  await Notes.remove(e.detail);
   Notes.saveStorage();
 });
 
-function render() {
-  const notes = Notes.all();
+async function render() {
+  const notes = await Notes.all();
   const notesContainer = document.querySelector("#notes");
   notesContainer.replaceChildren();
 
@@ -64,10 +68,11 @@ function render() {
 
     notesContainer.appendChild(container);
 
-    container.addEventListener("click", (e) => {
+    container.addEventListener("click", async (e) => {
       newNote.classList.add("hidden");
       editNote.classList.remove("hidden");
-      editNote.load(Notes.get(container.id));
+      const note = await Notes.get(container.id);
+      editNote.load(note);
     });
   });
 }
