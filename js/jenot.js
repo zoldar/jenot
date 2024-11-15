@@ -2,7 +2,28 @@ import "./service-worker.js";
 import { renderText } from "./dom.js";
 import { NoteStore } from "./store.js";
 import { DBNoteStore } from "./db-store.js";
+import {
+  authorizeNotifications,
+  notificationsEnabled,
+  sendNotification,
+} from "./notifications.js";
 import "./components.js";
+
+const notificationsButton = document.querySelector("#enable-notifications");
+const notificationsTestButton = document.querySelector("#test-notifications");
+
+if (!notificationsEnabled()) {
+  notificationsButton.classList.remove("hidden");
+  notificationsButton.addEventListener("click", () => {
+    authorizeNotifications(() => notificationsButton.classList.add("hidden"));
+  });
+}
+
+notificationsTestButton.addEventListener("click", () => {
+  setTimeout(() => {
+    sendNotification("reminder", "This is a test reminder!");
+  }, 8000);
+});
 
 const urlParams = new URLSearchParams(window.location.search);
 
