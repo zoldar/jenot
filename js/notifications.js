@@ -14,9 +14,11 @@ export function authorizeNotifications(afterCallback) {
   });
 }
 
-export function sendNotification(titleSuffix, message) {
-  return new Notification(`Jenot ${titleSuffix}`, {
-    body: message,
-    icon: notificationIcon,
-  });
+export async function sendNotification(titleSuffix, message) {
+  return navigator.serviceWorker.ready.then((registration) =>
+    registration.showNotification(`Jenot ${titleSuffix}`, {
+      body: message,
+      icon: notificationIcon,
+    }),
+  );
 }
