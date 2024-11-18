@@ -6,6 +6,7 @@ defmodule Jenot.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      Jenot.Repo,
       {Bandit, plug: Jenot.Web, scheme: :http, port: 4000}
     ]
 

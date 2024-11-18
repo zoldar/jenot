@@ -1,6 +1,11 @@
 const putInCache = async (request, response) => {
-  const cache = await caches.open("v1");
-  await cache.put(request, response);
+  const requestUrl = URL.parse(request.url);
+
+  // We don't cache API requests
+  if (!requestUrl.pathname.startsWith('/api/')) {
+    const cache = await caches.open("v1");
+    await cache.put(request, response);
+  }
 };
 
 const cacheFirst = async ({ request, fallbackUrl }) => {

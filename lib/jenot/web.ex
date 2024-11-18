@@ -5,6 +5,9 @@ defmodule Jenot.Web do
 
   use Plug.Router
 
+  alias Jenot.Accounts
+  alias Jenot.Notes
+
   if Mix.env() == :dev do
     plug PlugLiveReload
   end
@@ -17,6 +20,11 @@ defmodule Jenot.Web do
     at: "/",
     only: ~w(img js index.html site.webmanifest style.css),
     from: {:jenot, "priv/static"}
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :json],
+    pass: ["*/*"],
+    json_decoder: Jason
 
   plug :match
   plug :dispatch
@@ -36,6 +44,71 @@ defmodule Jenot.Web do
     send_resp(conn, 200, """
       Jenot API says hi!
     """)
+  end
+
+  get "/api/latest" do
+    account = Accounts.get()
+
+    send_resp(conn, 200, Jason.encode!(%{notes: Notes.latest_change(account)}))
+  end
+
+  get "/api/notes" do
+    account = Accounts.get()
+
+    notes =
+      account
+      |> Notes.all(conn.params["since"])
+      |> Enum.map(&Notes.serialize/1)
+
+    send_resp(conn, 200, Jason.encode!(notes))
+  end
+
+  post "/api/notes" do
+    account = Accounts.get()
+
+    case Notes.add(account, conn.params) do
+      {:ok, note} ->
+        send_resp(conn, 200, Jason.encode!(Notes.serialize(note)))
+
+      {:error, _} ->
+        send_resp(conn, 422, Jason.encode!(%{error: "Invalid input data"}))
+    end
+  end
+
+  put "/api/notes/:internal_id" do
+    account = Accounts.get()
+
+    case Notes.update(account, internal_id, conn.params) do
+      {:ok, note} ->
+        send_resp(conn, 200, Jason.encode!(Notes.serialize(note)))
+
+      {:error, :note_not_found} ->
+        send_resp(conn, 422, Jason.encode!(%{error: "Note does not exist"}))
+
+      {:error, :invalid_data} ->
+        send_resp(conn, 422, Jason.encode!(%{error: "Invalid input data"}))
+    end
+  end
+
+  delete "/api/notes/:internal_id" do
+    account = Accounts.get()
+
+    :ok = Notes.delete(account, internal_id)
+
+    send_resp(conn, 204, "")
+  end
+
+  get "/api/push/public-key" do
+    public_key = Application.fetch_env!(:web_push_elixir, :vapid_public_key)
+    send_resp(conn, 200, Jason.encode!(%{public_key: public_key}))
+  end
+
+  post "/api/push/subscribe" do
+    send_resp(conn, 200, "")
+  end
+
+  post "/api/push/unsubscribe" do
+    send_resp(conn, 200, "")
   end
 
   match _ do
