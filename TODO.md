@@ -1,6 +1,7 @@
 Only immediate next things to do are listed here, without any far-fetching plans.
 
-- Implement syncing data with server
+- Only soft-delete the notes, both in the frontend and backend
+- Implement proper, offline-friendly server data sync
 - Implement reminders
 - Implement masonry layout
 - Implement color coding
