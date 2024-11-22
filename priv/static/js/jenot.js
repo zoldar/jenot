@@ -2,6 +2,7 @@ import "./service-worker.js";
 import { renderText } from "./dom.js";
 import { NoteStore } from "./store.js";
 import { DBNoteStore } from "./db-store.js";
+import { WebNoteStore } from "./web-store.js";
 import {
   authorizeNotifications,
   notificationsEnabled,
@@ -29,7 +30,7 @@ const urlParams = new URLSearchParams(window.location.search);
 
 const Notes = urlParams.has("localStorage")
   ? new NoteStore("jenot-app")
-  : new DBNoteStore("jenot-app", "notes");
+  : new WebNoteStore("jenot-app", "notes");
 
 const newNote = document.querySelector("#new-note");
 const editNote = document.querySelector("#edit-note");
@@ -93,6 +94,7 @@ async function render() {
       newNote.classList.add("hidden");
       editNote.classList.remove("hidden");
       const note = await Notes.get(container.id);
+      console.log("edited note", note);
       editNote.load(note);
     });
   });

@@ -1,11 +1,6 @@
 const putInCache = async (request, response) => {
-  const requestUrl = URL.parse(request.url);
-
-  // We don't cache API requests
-  if (!requestUrl.pathname.startsWith('/api/')) {
-    const cache = await caches.open("v1");
-    await cache.put(request, response);
-  }
+  const cache = await caches.open("v1");
+  await cache.put(request, response);
 };
 
 const cacheFirst = async ({ request, fallbackUrl }) => {
@@ -33,10 +28,15 @@ const cacheFirst = async ({ request, fallbackUrl }) => {
 };
 
 self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    cacheFirst({
-      request: event.request,
-      fallbackUrl: "/index.html",
-    }),
-  );
+  const requestUrl = URL.parse(event.request.url);
+
+  // We don't cache API requests
+  if (!requestUrl.pathname.startsWith("/api")) {
+    event.respondWith(
+      cacheFirst({
+        request: event.request,
+        fallbackUrl: "/index.html",
+      }),
+    );
+  }
 });

@@ -63,6 +63,19 @@ defmodule Jenot.Web do
     send_resp(conn, 200, Jason.encode!(notes))
   end
 
+  get "/api/notes/:internal_id" do
+    account = Accounts.get()
+
+    case Notes.note_by_internal_id(account, internal_id) do
+      {:ok, note} ->
+        note = Notes.serialize(note)
+        send_resp(conn, 200, Jason.encode!(note))
+
+      {:error, :note_not_found} ->
+        send_resp(conn, 404, Jason.encode!(%{error: "Note not found"}))
+    end
+  end
+
   post "/api/notes" do
     account = Accounts.get()
 

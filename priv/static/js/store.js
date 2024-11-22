@@ -9,6 +9,7 @@ export class NoteStore extends EventTarget {
   - type - either `note` or `tasklist`
   - content - note's content
   - created - timestamp
+  - updated - timestamp
   */
 
   constructor(localStorageKey) {
@@ -32,11 +33,14 @@ export class NoteStore extends EventTarget {
   get = (id) => this.notes.find((note) => note.id === id);
 
   add(note) {
+    const now = Date.now();
+
     this.notes.unshift({
-      id: "id_" + Date.now(),
+      id: "id_" + now,
       type: note.type,
       content: note.content,
-      created: new Date(),
+      created: now,
+      updated: now,
     });
   }
 
@@ -49,6 +53,7 @@ export class NoteStore extends EventTarget {
   }
 
   update(note) {
+    note.updated = Date.now();
     this.notes = this.notes.map((n) => (n.id === note.id ? note : n));
   }
 

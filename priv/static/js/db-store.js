@@ -37,12 +37,14 @@ export class DBNoteStore extends EventTarget {
 
   async add(note) {
     const that = this;
+    const now = Date.now();
 
     const entry = {
-      id: "id_" + Date.now(),
+      id: "id_" + now,
       type: note.type,
       content: note.content,
-      created: new Date(),
+      created: now,
+      updated: now,
     };
 
     return this.#connect().then(
@@ -89,6 +91,8 @@ export class DBNoteStore extends EventTarget {
 
   async update(note) {
     const that = this;
+
+    note.updated = Date.now();
 
     return this.#connect().then(
       (db) =>

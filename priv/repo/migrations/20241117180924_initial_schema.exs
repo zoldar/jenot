@@ -11,10 +11,11 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
     create table(:notes, primary_key: false) do
       add :id, :uuid, null: false, primary_key: true
       add :internal_id, :text, null: false
-      add :account_id, references(:accounts, on_delete: :delete_all), null: false
-
+      add :type, :text, null: false
       add :title, :text, null: false, default: ""
       add :content, :text, null: false, default: ""
+
+      add :account_id, references(:accounts, on_delete: :delete_all), null: false
 
       timestamps(type: :datetime_usec)
     end
