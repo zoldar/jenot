@@ -11,6 +11,6 @@ defmodule Jenot.Subscription do
 
     belongs_to(:account, Jenot.Account)
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 end

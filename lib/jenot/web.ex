@@ -57,7 +57,7 @@ defmodule Jenot.Web do
 
     notes =
       account
-      |> Notes.all(conn.params["since"])
+      |> Notes.all(conn.params["since"], conn.params["deleted"] == "true")
       |> Enum.map(&Notes.serialize/1)
 
     send_resp(conn, 200, Jason.encode!(notes))
@@ -108,7 +108,7 @@ defmodule Jenot.Web do
 
     :ok = Notes.delete(account, internal_id)
 
-    send_resp(conn, 204, "")
+    send_resp(conn, 200, Jason.encode!(%{deleted: true}))
   end
 
   get "/api/push/public-key" do

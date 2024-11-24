@@ -1,8 +1,7 @@
-import "./service-worker.js";
+import "./service-worker-init.js";
 import { renderText } from "./dom.js";
-import { NoteStore } from "./store.js";
-import { DBNoteStore } from "./db-store.js";
-import { WebNoteStore } from "./web-store.js";
+import { LocalNoteStore } from "./local-store.js";
+import { SyncedNoteStore } from "./synced-store.js";
 import {
   authorizeNotifications,
   notificationsEnabled,
@@ -29,8 +28,16 @@ notificationsTestButton.addEventListener("click", () => {
 const urlParams = new URLSearchParams(window.location.search);
 
 const Notes = urlParams.has("localStorage")
-  ? new NoteStore("jenot-app")
-  : new WebNoteStore("jenot-app", "notes");
+  ? new LocalNoteStore("jenot-app")
+  : new SyncedNoteStore("jenot-app", "notes", "/");
+
+const sync = async () => {
+  await Notes.sync();
+  Notes.saveStorage();
+};
+
+sync();
+setInterval(sync, 5000);
 
 const newNote = document.querySelector("#new-note");
 const editNote = document.querySelector("#edit-note");
@@ -94,7 +101,6 @@ async function render() {
       newNote.classList.add("hidden");
       editNote.classList.remove("hidden");
       const note = await Notes.get(container.id);
-      console.log("edited note", note);
       editNote.load(note);
     });
   });

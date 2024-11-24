@@ -14,6 +14,7 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
       add :type, :text, null: false
       add :title, :text, null: false, default: ""
       add :content, :text, null: false, default: ""
+      add :deleted_at, :datetime_usec
 
       add :account_id, references(:accounts, on_delete: :delete_all), null: false
 
@@ -48,6 +49,8 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
       add :day_of_week, :integer
       add :repeat_period, :text
       add :repeat_count, :integer
+
+      add :deleted_at, :datetime_usec
 
       add :note_id, references(:note, on_delete: :delete_all), null: false
 

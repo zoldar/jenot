@@ -8,9 +8,10 @@ defmodule Jenot.Reminder do
     field(:day_of_week, :integer)
     field(:repeat_period, Ecto.Enum, values: [:day, :week, :month, :year])
     field(:repeat_count, :integer)
+    field(:deleted_at, :utc_datetime_usec)
 
     belongs_to(:note, Jenot.Note)
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 end

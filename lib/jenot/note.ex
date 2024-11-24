@@ -9,22 +9,32 @@ defmodule Jenot.Note do
     field(:type, Ecto.Enum, values: [:note, :tasklist], default: :note)
     field(:title, :string, default: "")
     field(:content, :string)
+    field(:deleted_at, :utc_datetime_usec)
 
     belongs_to(:account, Jenot.Account, type: :binary_id)
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 
   def new(account, params) do
     %__MODULE__{}
-    |> cast(params, [:internal_id, :type, :title, :content])
+    |> cast(params, [
+      :internal_id,
+      :type,
+      :title,
+      :content,
+      :deleted_at,
+      :inserted_at,
+      :updated_at
+    ])
     |> put_change(:id, Ecto.UUID.generate())
-    |> validate_required([:internal_id, :type])
+    |> validate_required([:internal_id, :type, :inserted_at, :updated_at])
     |> put_assoc(:account, account)
   end
 
   def update(note, params) do
     note
-    |> cast(params, [:type, :title, :content])
+    |> cast(params, [:type, :title, :content, :deleted_at, :updated_at])
+    |> validate_required([:internal_id, :type, :updated_at])
   end
 end

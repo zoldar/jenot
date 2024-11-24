@@ -1,4 +1,4 @@
-export class NoteStore extends EventTarget {
+export class LocalNoteStore extends EventTarget {
   localStorageKey;
   notes = [];
 
@@ -44,10 +44,6 @@ export class NoteStore extends EventTarget {
     });
   }
 
-  reset() {
-    this.notes = [];
-  }
-
   remove({ id }) {
     this.notes = this.notes.filter((note) => note.id !== id);
   }
@@ -56,6 +52,8 @@ export class NoteStore extends EventTarget {
     note.updated = Date.now();
     this.notes = this.notes.map((n) => (n.id === note.id ? note : n));
   }
+
+  sync() {}
 
   saveStorage() {
     window.localStorage.setItem(

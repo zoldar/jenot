@@ -5,7 +5,7 @@ defmodule Jenot.Account do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "accounts" do
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 
   def new() do
