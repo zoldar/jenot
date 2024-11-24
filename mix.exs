@@ -7,11 +7,11 @@ defmodule Jenot.MixProject do
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger],
@@ -19,9 +19,23 @@ defmodule Jenot.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  def releases do
+    [
+      jenot: [
+        steps: [:assemble, &Burrito.wrap/1],
+        burrito: [
+          targets: [
+            macos: [os: :darwin, cpu: :x86_64],
+            linux: [os: :linux, cpu: :x86_64]
+          ]
+        ]
+      ]
+    ]
+  end
+
   defp deps do
     [
+      {:burrito, "~> 1.0"},
       {:bandit, "~> 1.0"},
       {:web_push_elixir, "~> 0.4.0"},
       {:ecto_sqlite3, "~> 0.17"},

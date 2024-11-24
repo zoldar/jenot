@@ -26,3 +26,4 @@ jenot-*.tar
 /tmp/
 
 /priv/db_*
+/burrito_out/
