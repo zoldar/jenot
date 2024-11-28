@@ -1,7 +1,5 @@
 Only immediate next things to do are listed here, without any far-fetching plans.
 
-- Refactor and add basic tests
-- Improve server data sync
 - Implement basic account provisioning and authentication
 - Make a fully functional binary release
 - Implement reminders
