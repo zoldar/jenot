@@ -62,12 +62,12 @@ class WebNoteStore {
 }
 
 export class SyncedNoteStore extends EventTarget {
-  constructor(dbName, storeName, endpoint) {
+  constructor(dbName, storeName, endpoint, webStore) {
     super();
     this.dbName = dbName;
     this.storeName = storeName;
     this.db = null;
-    this.webStore = endpoint && new WebNoteStore(endpoint);
+    this.webStore = webStore || (endpoint && new WebNoteStore(endpoint));
   }
 
   async all(since, includeDeleted) {

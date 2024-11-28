@@ -66,7 +66,7 @@ export function runTests(globalOptions) {
     log.appendChild(logRow);
 
     try {
-      await testFun(container);
+      await testFun(container, idx);
       const message = `[OK] ${label}`;
       console.info(message);
       logRow.textContent = message;
