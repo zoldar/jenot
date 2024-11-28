@@ -11,8 +11,7 @@ defmodule Jenot.Notes do
   def latest_change(account) do
     Note
     |> where(account_id: ^account.id)
-    |> where([n], is_nil(n.deleted_at))
-    |> select([n], max(n.updated_at))
+    |> select([n], max(n.server_updated_at))
     |> Repo.one()
   end
 
@@ -148,7 +147,7 @@ defmodule Jenot.Notes do
       |> String.to_integer()
       |> DateTime.from_unix!(:millisecond)
 
-    where(query, [n], n.updated_at > ^datetime)
+    where(query, [n], n.server_updated_at > ^datetime)
   end
 
   defp upsert(changeset, opts) do
@@ -195,6 +194,7 @@ defmodule Jenot.Notes do
                 ^deleted_at,
                 n.deleted_at
               ),
+            server_updated_at: ^DateTime.utc_now(),
             updated_at:
               fragment(
                 "CASE WHEN ? > ? THEN ? ELSE ? END",

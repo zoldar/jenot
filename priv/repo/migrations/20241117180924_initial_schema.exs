@@ -18,6 +18,7 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
 
       add :account_id, references(:accounts, on_delete: :delete_all), null: false
 
+      add :server_updated_at, :datetime_usec, null: false
       timestamps(type: :datetime_usec)
     end
 

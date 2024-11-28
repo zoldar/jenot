@@ -26,7 +26,6 @@ const sync = async () => {
   Notes.saveStorage();
 };
 
-sync();
 setInterval(sync, 5000);
 
 // Notifications API test - to be reused for push notifications later on
@@ -57,8 +56,9 @@ const editNote = document.querySelector("#edit-note");
 // of notes list.
 Notes.addEventListener("save", render.bind(this));
 
-// Initial notes render.
+// Initial notes render and initial sync.
 render();
+sync();
 
 // note-form component specific event handlers
 newNote.addEventListener("addNote", async (e) => {

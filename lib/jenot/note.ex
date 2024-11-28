@@ -13,6 +13,7 @@ defmodule Jenot.Note do
 
     belongs_to(:account, Jenot.Account, type: :binary_id)
 
+    field(:server_updated_at, :utc_datetime_usec)
     timestamps(type: :utc_datetime_usec)
   end
 
@@ -28,6 +29,7 @@ defmodule Jenot.Note do
       :updated_at
     ])
     |> put_change(:id, Ecto.UUID.generate())
+    |> put_change(:server_updated_at, DateTime.utc_now())
     |> validate_required([:internal_id, :type, :inserted_at, :updated_at])
     |> put_assoc(:account, account)
   end

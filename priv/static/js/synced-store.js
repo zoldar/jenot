@@ -12,11 +12,19 @@ class WebNoteStore {
       params.append("deleted", "true");
     }
     const suffix = params.size > 0 ? `?${params.toString()}` : "";
-    return this.#request(`${this.endpoint}api/notes${suffix}`, {}, () => []);
+    return this.#request(
+      `${this.endpoint}api/notes${suffix}`,
+      {},
+      () => "no_network",
+    );
   }
 
   async get(id) {
-    return this.#request(`${this.endpoint}api/notes/${id}`, {}, () => null);
+    return this.#request(
+      `${this.endpoint}api/notes/${id}`,
+      {},
+      () => "no_network",
+    );
   }
 
   async add(note) {
@@ -26,7 +34,7 @@ class WebNoteStore {
         method: "POST",
         body: JSON.stringify(note),
       },
-      () => null,
+      () => "no_network",
     );
   }
 
@@ -37,7 +45,7 @@ class WebNoteStore {
         method: "PUT",
         body: JSON.stringify(note),
       },
-      () => null,
+      () => "no_network",
     );
   }
 
@@ -174,7 +182,7 @@ export class SyncedNoteStore extends EventTarget {
           ),
       )
       .then(() => {
-        (async () => (skipNetwork ? null : this.webStore?.update(note)))();
+        (async () => (skipNetwork ? null : this.webStore?.add(note)))();
         return null;
       });
   }
@@ -183,19 +191,33 @@ export class SyncedNoteStore extends EventTarget {
     const that = this;
     const meta = await this.getMeta();
     const lastSync = meta?.lastSync;
+    const currentSync = Date.now();
 
     this.all(lastSync, true)
       .then((notes) => {
-        notes.forEach(async (n) => await that.webStore.add(n));
+        return Promise.all(notes.map((n) => that.webStore.add(n)));
       })
-      .then(() => that.webStore.all(lastSync, true))
+      .then((results) => {
+        if (results.indexOf("no_network") < 0) {
+          return that.webStore.all(lastSync, true);
+        } else {
+          return "no_network";
+        }
+      })
       .then((notes) => {
-        notes.forEach(async (n) => await that.update(n, true));
+        if (notes !== "no_network") {
+          notes.forEach(async (n) => await that.update(n, true));
+          return null;
+        } else {
+          return "no_network";
+        }
       })
-      .then(() => {
-        meta.lastSync = Date.now();
+      .then((result) => {
+        if (result !== "no_network") {
+          meta.lastSync = currentSync;
 
-        that.setMeta(meta);
+          that.setMeta(meta);
+        }
       });
   }
 
@@ -232,30 +254,5 @@ export class SyncedNoteStore extends EventTarget {
         });
       };
     });
-  }
-
-  #request(url, opts, emptyValue) {
-    new Promise((resolve) => {
-      return resolve(this.#runRequest(url, opts, () => emptyValue));
-    });
-  }
-
-  async #runRequest(url, opts, errorCallback) {
-    opts.headers = {
-      ...(opts.headers || {}),
-      "Content-Type": "application/json",
-    };
-
-    try {
-      const response = await fetch(url, opts);
-      if (!response.ok) {
-        console.error("Request failed", response);
-        return errorCallback(response);
-      }
-      return response.json();
-    } catch (error) {
-      console.error("Request error", error);
-      return errorCallback(error);
-    }
   }
 }
