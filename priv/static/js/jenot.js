@@ -9,6 +9,28 @@ import {
 } from "./notifications.js";
 import "./components.js";
 
+const URL_PARAMS = new URLSearchParams(window.location.search);
+
+// Notes storage configuration.
+// Currently supports either simple, local storage based implementation
+// and a more elaborate one, using a combination of IndexedDB + network sync.
+const Notes = URL_PARAMS.has("localStorage")
+  ? new LocalNoteStore("jenot-app")
+  : new SyncedNoteStore("jenot-app", "notes", "/");
+
+// Very rudimentary periodic sync. It will be refactored into a more real-time
+// solution using either websocket of long-polling, so that server can notify about
+// new data to sync.
+const sync = async () => {
+  await Notes.sync();
+  Notes.saveStorage();
+};
+
+sync();
+setInterval(sync, 5000);
+
+// Notifications API test - to be reused for push notifications later on
+
 const notificationsButton = document.querySelector("#enable-notifications");
 const notificationsTestButton = document.querySelector("#test-notifications");
 
@@ -25,27 +47,20 @@ notificationsTestButton.addEventListener("click", () => {
   }, 8000);
 });
 
-const urlParams = new URLSearchParams(window.location.search);
-
-const Notes = urlParams.has("localStorage")
-  ? new LocalNoteStore("jenot-app")
-  : new SyncedNoteStore("jenot-app", "notes", "/");
-
-const sync = async () => {
-  await Notes.sync();
-  Notes.saveStorage();
-};
-
-sync();
-setInterval(sync, 5000);
+// There are two note-form component instances - one for
+// composing new notes and another one for editing existing notes.
 
 const newNote = document.querySelector("#new-note");
 const editNote = document.querySelector("#edit-note");
 
+// Each save event originating from storage triggers a re-render
+// of notes list.
 Notes.addEventListener("save", render.bind(this));
 
+// Initial notes render.
 render();
 
+// note-form component specific event handlers
 newNote.addEventListener("addNote", async (e) => {
   await Notes.add(e.detail);
   Notes.saveStorage();
@@ -64,6 +79,11 @@ editNote.addEventListener("deleteNote", async (e) => {
   await Notes.remove(e.detail);
   Notes.saveStorage();
 });
+
+// All notes are currently re-rendered on each storage
+// update. The routine will be optimized to replace only
+// nodes that actually changed - most likely based on unique
+// note IDs associated with block elements.
 
 async function render() {
   const notes = await Notes.all();

@@ -18,7 +18,7 @@ defmodule Jenot.Web do
 
   plug Plug.Static,
     at: "/",
-    only: ~w(img js index.html site.webmanifest style.css),
+    only: ~w(img js index.html test.html site.webmanifest style.css),
     from: {:jenot, "priv/static"}
 
   plug Plug.Parsers,
@@ -30,11 +30,6 @@ defmodule Jenot.Web do
   plug :dispatch
 
   get "/" do
-    priv_dir = :code.priv_dir(:jenot)
-    index_path = Path.join([priv_dir, "static", "index.html"])
-
-    send_file(conn, 200, index_path)
-
     conn
     |> resp(:found, "")
     |> put_resp_header("location", "/index.html")

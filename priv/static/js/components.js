@@ -11,7 +11,8 @@ class EditableArea extends HTMLElement {
 
   connectedCallback() {
     const text = this.textContent;
-    this.displayElement = document.createElement("p", { class: "display" });
+    this.displayElement = document.createElement("p");
+    this.displayElement.classList.add("display");
     this.inputElement = document.createElement("textarea");
     this.inputElement.value = text;
 

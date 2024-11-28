@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jenot Tests</title>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/img/favicon-16x16.png"
+    />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/js/jenot-tests.js" defer></script>
+    <style type="text/css">
+      #test-log li {
+        color: lightgrey;
+      }
+      #test-log li.success {
+        color: green;
+      }
+
+      #test-log li.failure {
+        color: red;
+      }
+
+      #test-log li pre {
+        font-family: "Courier New", Courier, monospace;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="content"></div>
+    <ol id="test-log"></ul>
+  </body>
+</html>
