@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jenot</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/img/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/img/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/img/favicon-16x16.png"
+    />
+  </head>
+  <body>
+    <div id="content">
+      <h1>Jenot</h1>
+
+      <form>
+        <fieldset disabled>
+          <label for="account-name">Your account name:</label>
+          <input id="account-name" type="text" value="<%= name %>">
+        </fieldset>
+        <fieldset disabled>
+          <label for="account-code">Your secret code:</label>
+          <input id="account-code" type="text" value="<%= code %>">
+        </fieldset>
+      </form>
+      <a href="/index.html?reset-meta">Open Jenot</a>
+    </div>
+  </body>
+</html>

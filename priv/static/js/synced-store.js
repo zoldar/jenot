@@ -123,7 +123,7 @@ export class SyncedNoteStore extends EventTarget {
 
   async setMeta(meta) {
     meta.id = "meta";
-    this.update(meta, true);
+    return this.update(meta, true);
   }
 
   async add(note) {
@@ -193,7 +193,7 @@ export class SyncedNoteStore extends EventTarget {
     const lastSync = meta?.lastSync;
     const currentSync = Date.now();
 
-    this.all(lastSync, true)
+    return this.all(lastSync, true)
       .then((notes) => {
         return Promise.all(notes.map((n) => that.webStore.add(n)));
       })

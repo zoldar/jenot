@@ -4,6 +4,8 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
   def change do
     create table(:accounts, primary_key: false) do
       add :id, :uuid, primary_key: true
+      add :name, :text, null: false
+      add :code_digest, :text, null: false
 
       timestamps(type: :datetime_usec)
     end

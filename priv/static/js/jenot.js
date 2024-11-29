@@ -1,6 +1,5 @@
 import "./service-worker-init.js";
 import { renderText } from "./dom.js";
-import { LocalNoteStore } from "./local-store.js";
 import { SyncedNoteStore } from "./synced-store.js";
 import {
   authorizeNotifications,
@@ -11,12 +10,25 @@ import "./components.js";
 
 const URL_PARAMS = new URLSearchParams(window.location.search);
 
+// Cookie presence determines login state
+const isLoggedIn = !!document.cookie
+  .split("; ")
+  .find((row) => row.startsWith("jenot_pub="));
+
 // Notes storage configuration.
-// Currently supports either simple, local storage based implementation
-// and a more elaborate one, using a combination of IndexedDB + network sync.
-const Notes = URL_PARAMS.has("localStorage")
-  ? new LocalNoteStore("jenot-app")
-  : new SyncedNoteStore("jenot-app", "notes", "/");
+// The storage is a combination of IndexedDB + network sync.
+// Network sync is only enabled is user is logged in.
+const Notes = new SyncedNoteStore("jenot-app", "notes", isLoggedIn && "/");
+
+// Reset metadata to force full sync
+if (URL_PARAMS.has("reset-meta")) {
+  history.replaceState(
+    null,
+    "",
+    location.href.replace("&reset-meta", "").replace("?reset-meta", ""),
+  );
+  await Notes.setMeta({ lastSync: null });
+}
 
 // Very rudimentary periodic sync. It will be refactored into a more real-time
 // solution using either websocket of long-polling, so that server can notify about
@@ -26,7 +38,22 @@ const sync = async () => {
   Notes.saveStorage();
 };
 
-setInterval(sync, 5000);
+if (isLoggedIn) {
+  setInterval(sync, 5000);
+}
+
+// New account provisioning and login/logout actions
+
+const newAccountForm = document.querySelector("#new-account-form");
+const loginLink = document.querySelector("#login-link");
+const logoutForm = document.querySelector("#logout-form");
+
+if (!isLoggedIn) {
+  loginLink.classList.remove("hidden");
+  newAccountForm.classList.remove("hidden");
+} else {
+  logoutForm.classList.remove("hidden");
+}
 
 // Notifications API test - to be reused for push notifications later on
 
@@ -58,7 +85,9 @@ Notes.addEventListener("save", render.bind(this));
 
 // Initial notes render and initial sync.
 render();
-sync();
+if (isLoggedIn) {
+  sync();
+}
 
 // note-form component specific event handlers
 newNote.addEventListener("addNote", async (e) => {
