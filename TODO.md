@@ -1,6 +1,8 @@
 Only immediate next things to do are listed here, without any far-fetching plans.
 
 - Polish what's implemented so far (UX/UI mostly)
+- Autorender links in notes
+- Implement search
 - Implement reminders
 - Implement push notifications
 - Implement masonry layout
