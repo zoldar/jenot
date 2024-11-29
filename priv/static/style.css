@@ -110,17 +110,44 @@ editable-area textarea:focus {
 /* Task list */
 
 task-list ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   wdith: 100%;
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
+task-list li:has(.checkbox input:checked) {
+  order: 1;
+}
+
+task-list-item .remove {
+  visibility: hidden;
+}
+
+task-list-item:hover .remove {
+  visibility: visible;
+}
+
+task-list-item:has(textarea:focus) .remove {
+  visibility: visible;
+}
+
+task-list-item .checkbox input {
+  accent-color: gray;
+}
+
+task-list-item:has(.checkbox input:checked) editable-area p.display {
+  text-decoration: line-through;
+  color: gray;
+}
+
 task-list-item {
   display: flex;
   gap: 6px;
   align-items: baseline;
-  margin-bottom: 4px;
 }
 
 task-list-item .handle button {
@@ -153,31 +180,54 @@ note-form .content {
   min-height: 2.5em;
 }
 
+note-form .toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
 note-form .note {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 /* Styles */
+
+:root {
+  --gap-1: 10px;
+}
 
 * {
   font-family: Arial, Helvetica, sans-serif;
   color: #222;
 }
 
-div#content {
+#content {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
   /* width: 270px; */
   max-width: 1200px;
-  margin: 10px auto 0 auto;
+  margin: var(--gap-1) auto 0 auto;
+  padding: 0 var(--gap-1);
+}
+
+#top-bar {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: var(--gap-1);
+}
+
+#notes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .note {
-  /* min-width: 240px; */
   background: beige;
   box-shadow: 2px 2px 4px 0px rgb(0 0 0 / 0.8);
   padding: 4px 8px;
-  margin-bottom: 20px;
 }
 
 .note.readonly ul {

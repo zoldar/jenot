@@ -28,22 +28,43 @@
 
   <body>
     <div id="content">
-      <h1>Jenot</h1>
+      <nav id="top-bar">
+        <div>
+          <a id="login-link" class="hidden" href="/account/authenticate">
+            Log in
+          </a>
+        </div>
+        <form
+          id="new-account-form"
+          class="hidden"
+          action="/account/new"
+          method="post"
+          onsubmit="return confirm('Are you sure you want to create a new account?')"
+        >
+          <button type="submit">New account</button>
+        </form>
+        <form
+          id="logout-form"
+          class="hidden"
+          action="/account/logout"
+          method="post"
+          onsubmit="return confirm('Are you sure you want to log out?')"
+        >
+          <button type="submit">Log out</button>
+        </form>
 
-      <a id="login-link" class="hidden" href="/account/authenticate">Log in</a>
-      <form id="new-account-form" class="hidden" action="/account/new" method="post">
-        <button type="submit">New account</button>
-      </form>
-      <form id="logout-form" class="hidden" action="/account/logout" method="post">
-        <button type="submit">Log out</button>
-      </form>
-      <button id="enable-notifications" class="hidden"">Enable notifications</button>
-      <button id="test-notifications">Send test notification</button>
+        <div class="hidden">
+          <!-- Hidden for now, until push notifications are implemented -->
+          <button id="enable-notifications" class="hidden">
+            Enable notifications
+          </button>
+          <button id="test-notifications">Send test notification</button>
+        </div>
+      </nav>
 
       <note-form mode="add" id="new-note">
         <div class="note">
-          <p class="content">
-          </p>
+          <p class="content"></p>
           <div class="toolbar">
             <button class="add">➕</button>
             <button class="tasklist-mode">☑️</button>
@@ -55,8 +76,7 @@
 
       <note-form mode="edit" id="edit-note" class="hidden">
         <div class="note">
-          <p class="content">
-          </p>
+          <p class="content"></p>
           <div class="toolbar">
             <button class="save">💾</button>
             <button class="tasklist-mode">☑️</button>
