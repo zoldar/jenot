@@ -1,5 +1,6 @@
 Only immediate next things to do are listed here, without any far-fetching plans.
 
+- Polish what's implemented so far (UX/UI mostly)
 - Implement reminders
 - Implement push notifications
 - Implement masonry layout
