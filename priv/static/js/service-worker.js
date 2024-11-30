@@ -1,42 +1,68 @@
 // caching
 
-const putInCache = async (request, response) => {
-  const cache = await caches.open("v1");
-  await cache.put(request, response);
-};
+const cacheName = "jenot-v1";
+const appShellFiles = [
+  "/index.html",
+  "/style.css",
+  "/img/android-chrome-192x192.png",
+  "/img/android-chrome-512x512.png",
+  "/img/apple-touch-icon.png",
+  "/img/favicon.ico",
+  "/img/favicon-16x16.png",
+  "/img/favicon-32x32.png",
+  "/js/components.js",
+  "/js/dom.js",
+  "/js/jenot.js",
+  "/js/notifications.js",
+  "/js/service-worker-init.js",
+  "/js/synced-store.js",
+];
 
-const cacheFirst = async ({ request, fallbackUrl }) => {
-  const responseFromCache = await caches.match(request);
+const cacheFirst = async (e) => {
+  const responseFromCache = await caches.match(e.request);
   if (responseFromCache) {
     return responseFromCache;
   }
 
-  try {
-    const responseFromNetwork = await fetch(request);
-    // Cloning is needed because a response can only be consumed once.
-    putInCache(request, responseFromNetwork.clone());
-    return responseFromNetwork;
-  } catch (error) {
-    const fallbackResponse = await caches.match(fallbackUrl);
-    if (fallbackResponse) {
-      return fallbackResponse;
-    }
-
-    return new Response("Network error happened", {
-      status: 408,
-      headers: { "Content-Type": "text/plain" },
-    });
-  }
+  const responseFromNetwork = await fetch(e.request);
+  // Cloning is needed because a response can only be consumed once.
+  caches
+    .open(cacheName)
+    .then((cache) => cache.put(e.request, responseFromNetwork.clone()));
+  return responseFromNetwork;
 };
 
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches
+      .open(cacheName)
+      .then((cache) => cache.addAll(appShellFiles))
+      .then(() => self.skipWaiting()),
+  );
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches
+      .keys()
+      .then((keyList) => {
+        return Promise.all(
+          keyList.map((key) => {
+            if (key === cacheName) {
+              return;
+            }
+            return caches.delete(key);
+          }),
+        );
+      })
+      .then(() => self.clients.claim()),
+  );
+});
+
 self.addEventListener("fetch", (event) => {
-  // We don't cache API requests
-  if (!event.request.url.pathname.startsWith("/api")) {
-    event.respondWith(
-      cacheFirst({
-        request: event.request,
-        fallbackUrl: "/index.html",
-      }),
-    );
+  if (event.request.url.pathname.startsWith("/api")) {
+    return;
   }
+
+  event.respondWith(cacheFirst(event));
 });
