@@ -1,3 +1,9 @@
+/* Variables */
+
+:root {
+  --gap-1: 10px;
+}
+
 /* CSS reset */
 
 *,
@@ -192,10 +198,6 @@ note-form .note {
 }
 
 /* Styles */
-
-:root {
-  --gap-1: 10px;
-}
 
 * {
   font-family: Arial, Helvetica, sans-serif;
