@@ -31,10 +31,6 @@ const cacheFirst = async ({ request, fallbackUrl }) => {
 
 self.addEventListener("fetch", (event) => {
   // We don't cache API requests
-  if (!event.request.url?.pathname) {
-    return true;
-  }
-
   if (!event.request.url.pathname.startsWith("/api")) {
     event.respondWith(
       cacheFirst({
