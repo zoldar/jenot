@@ -133,7 +133,13 @@ task-list-item .remove {
   visibility: hidden;
 }
 
-task-list-item:hover .remove {
+@media (hover: hover) and (pointer: fine) {
+  task-list li:hover .remove {
+    visibility: visible;
+  }
+}
+
+task-list-item .remove:has(button:active) {
   visibility: visible;
 }
 
