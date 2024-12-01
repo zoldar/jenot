@@ -2,6 +2,7 @@ import "./service-worker-init.js";
 import { renderText } from "./dom.js";
 import { SyncedNoteStore } from "./synced-store.js";
 import {
+  notificationsAvailable,
   authorizeNotifications,
   notificationsEnabled,
   sendNotification,
@@ -57,21 +58,24 @@ if (!isLoggedIn) {
 
 // Notifications API test - to be reused for push notifications later on
 
-const notificationsButton = document.querySelector("#enable-notifications");
-const notificationsTestButton = document.querySelector("#test-notifications");
+if (notificationsAvailable()) {
+  document.querySelector("#notifications-pane").classList.remove("hidden");
+  const notificationsButton = document.querySelector("#enable-notifications");
+  const notificationsTestButton = document.querySelector("#test-notifications");
 
-if (!notificationsEnabled()) {
-  notificationsButton.classList.remove("hidden");
-  notificationsButton.addEventListener("click", () => {
-    authorizeNotifications(() => notificationsButton.classList.add("hidden"));
+  if (!notificationsEnabled()) {
+    notificationsButton.classList.remove("hidden");
+    notificationsButton.addEventListener("click", () => {
+      authorizeNotifications(() => notificationsButton.classList.add("hidden"));
+    });
+  }
+
+  notificationsTestButton.addEventListener("click", () => {
+    setTimeout(() => {
+      sendNotification("reminder", "This is a test reminder!");
+    }, 8000);
   });
 }
-
-notificationsTestButton.addEventListener("click", () => {
-  setTimeout(() => {
-    sendNotification("reminder", "This is a test reminder!");
-  }, 8000);
-});
 
 // There are two note-form component instances - one for
 // composing new notes and another one for editing existing notes.

@@ -1,7 +1,10 @@
 const notificationIcon = "/img/android-chrome-192x192.png";
 
+export function notificationsAvailable() {
+  return !!window.Notification;
+}
 export function notificationsEnabled() {
-  return Notification.permission === "granted";
+  return window.Notification && Notification.permission === "granted";
 }
 
 export function authorizeNotifications(afterCallback) {
