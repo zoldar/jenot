@@ -26,9 +26,10 @@ const cacheFirst = async (e) => {
 
   const responseFromNetwork = await fetch(e.request);
   // Cloning is needed because a response can only be consumed once.
+  const responseClone = responseFromNetwork.clone();
   caches
     .open(cacheName)
-    .then((cache) => cache.put(e.request, responseFromNetwork.clone()));
+    .then((cache) => cache.put(e.request.clone(), responseClone));
   return responseFromNetwork;
 };
 
