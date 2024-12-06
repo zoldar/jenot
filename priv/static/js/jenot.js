@@ -113,48 +113,95 @@ editNote.addEventListener("deleteNote", async (e) => {
   Notes.saveStorage();
 });
 
-// All notes are currently re-rendered on each storage
-// update. The routine will be optimized to replace only
-// nodes that actually changed - most likely based on unique
-// note IDs associated with block elements.
+// The notes rendering routine is optimized to replace only
+// nodes that actually changed.
+
+let currentNotes = {};
+
+function notesEqual(note1, note2) {
+  return note1.id === note2.id && note1.updated === note2.updated;
+}
 
 async function render() {
   const notes = await Notes.all();
   const notesContainer = document.querySelector("#notes");
-  notesContainer.replaceChildren();
+
+  let previousId = null;
+  let notePrecedence = {};
+  const ids = [];
+
+  notes.forEach((n) => {
+    notePrecedence[n.id] = previousId;
+    ids.push(n.id);
+    previousId = n.id;
+  });
+
+  Object.keys(currentNotes)
+    .filter((id) => !ids.includes(id))
+    .forEach((id) => {
+      delete currentNotes[id];
+      document.getElementById(id).remove();
+    });
 
   notes.forEach((note) => {
-    const container = document.createElement("div");
-    container.id = note.id;
-    container.classList.add("note");
-    container.classList.add("readonly");
+    const existingNote = currentNotes[note.id];
 
-    if (note.type === "note") {
-      container.replaceChildren(...renderText(note.content));
-    } else if (note.type === "tasklist") {
-      const list = document.createElement("ul");
+    if (!existingNote) {
+      const noteElement = renderNote(note);
+      const beforeId = notePrecedence[note.id];
 
-      note.content.forEach((task) => {
-        const item = document.createElement("li");
-        const check = document.createElement("p");
-        check.textContent = task.checked ? "☑" : "☐";
-        item.appendChild(check);
-        const itemContent = document.createElement("p");
-        itemContent.replaceChildren(...renderText(task.content));
-        item.appendChild(itemContent);
-        list.append(item);
-      });
-
-      container.appendChild(list);
+      if (!beforeId) {
+        notesContainer.prepend(noteElement);
+      } else {
+        const before = document.getElementById(beforeId);
+        if (before) {
+          before.after(noteElement);
+        } else {
+          notesContainer.prepend(noteElement);
+        }
+      }
+    } else if (!notesEqual(existingNote, note)) {
+      const noteElement = renderNote(note);
+      const existing = document.getElementById(note.id);
+      existing.replaceWith(noteElement);
     }
-
-    notesContainer.appendChild(container);
-
-    container.addEventListener("click", async (e) => {
-      newNote.classList.add("hidden");
-      editNote.classList.remove("hidden");
-      const note = await Notes.get(container.id);
-      editNote.load(note);
-    });
   });
+
+  currentNotes = {};
+  notes.forEach((n) => (currentNotes[n.id] = n));
+}
+
+function renderNote(note) {
+  const container = document.createElement("div");
+  container.id = note.id;
+  container.classList.add("note");
+  container.classList.add("readonly");
+
+  if (note.type === "note") {
+    container.replaceChildren(...renderText(note.content));
+  } else if (note.type === "tasklist") {
+    const list = document.createElement("ul");
+
+    note.content.forEach((task) => {
+      const item = document.createElement("li");
+      const check = document.createElement("p");
+      check.textContent = task.checked ? "☑" : "☐";
+      item.appendChild(check);
+      const itemContent = document.createElement("p");
+      itemContent.replaceChildren(...renderText(task.content));
+      item.appendChild(itemContent);
+      list.append(item);
+    });
+
+    container.appendChild(list);
+  }
+
+  container.addEventListener("click", async (e) => {
+    newNote.classList.add("hidden");
+    editNote.classList.remove("hidden");
+    const note = await Notes.get(container.id);
+    editNote.load(note);
+  });
+
+  return container;
 }
