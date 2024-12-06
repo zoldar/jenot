@@ -89,7 +89,7 @@ export class SyncedNoteStore extends EventTarget {
             .getAll().onsuccess = (data) => {
             const results = data.target.result.filter(
               (n) => (includeDeleted || !n.deleted) && n.id !== "meta",
-            );
+            ).toSorted((a, b) => b.created - a.created);
 
             if (since > 0) {
               return resolve(results.filter((n) => n.updated > since));
