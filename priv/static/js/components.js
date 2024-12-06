@@ -456,6 +456,20 @@ class NoteForm extends HTMLElement {
     this.addButton = this.querySelector(".add");
     this.saveButton = this.querySelector(".save");
 
+    this.addEventListener("click", (e) => {
+      if (
+        !(
+          e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLButtonElement ||
+          e.target instanceof HTMLTextAreaElement
+        )
+      ) {
+        this.content.querySelector("textarea")?.focus();
+      }
+
+      return true;
+    });
+
     this.tasklistModeButton.addEventListener("click", (e) => {
       e.preventDefault();
       this.note.type = "tasklist";
