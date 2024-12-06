@@ -2,6 +2,25 @@
 
 :root {
   --gap-1: 10px;
+  --font-color: #222;
+  --button-text-color: #222;
+  --background: #eee;
+  --note-background: beige;
+  --shadow-color: rgb(0 0 0 / 0.8);
+  --button-background: lightray;
+  --inactive-color: gray;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --font-color: antiquewhite;
+    --button-text-color: black;
+    --background: #222;
+    --note-background: dimgray;
+    --shadow-color: rgb(211 211 211 / 0.8);
+    --button-background: silver;
+    --inactive-color: lightgray;
+  }
 }
 
 /* CSS reset */
@@ -148,12 +167,12 @@ task-list-item:has(textarea:focus) .remove {
 }
 
 task-list-item .checkbox input {
-  accent-color: gray;
+  accent-color: var(--inactive-color);
 }
 
 task-list-item:has(.checkbox input:checked) editable-area p.display {
   text-decoration: line-through;
-  color: gray;
+  color: var(--inactive-color);
 }
 
 task-list-item {
@@ -178,7 +197,7 @@ li.dragging {
 
 .drag-placeholder {
   opacity: 0.5;
-  background-color: beige;
+  background-color: var(--note-background);
 }
 
 .draggable,
@@ -207,7 +226,16 @@ note-form .note {
 
 * {
   font-family: Arial, Helvetica, sans-serif;
-  color: #222;
+  color: var(--font-color);
+}
+
+body {
+  background: var(--background);
+}
+
+button {
+  color: var(--button-text-color);
+  background: var(--button-background);
 }
 
 #content {
@@ -233,8 +261,8 @@ note-form .note {
 }
 
 .note {
-  background: beige;
-  box-shadow: 2px 2px 4px 0px rgb(0 0 0 / 0.8);
+  background: var(--note-background);
+  box-shadow: 2px 2px 4px 0px var(--shadow-color);
   padding: 4px 8px;
 }
 
@@ -250,6 +278,10 @@ note-form .note {
   gap: 6px;
   align-items: baseline;
   margin-bottom: 4px;
+}
+
+task-list li:has(.checkbox input:checked) {
+  order: 1;
 }
 
 .hidden {
