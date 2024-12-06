@@ -5,9 +5,10 @@
   --font-color: #222;
   --button-text-color: #222;
   --background: #eee;
-  --note-background: beige;
+  --note-background: bisque;
+  --highlight-color: beige;
   --shadow-color: rgb(0 0 0 / 0.8);
-  --button-background: lightray;
+  --button-background: lightgray;
   --inactive-color: gray;
 }
 
@@ -17,6 +18,7 @@
     --button-text-color: black;
     --background: #222;
     --note-background: dimgray;
+    --highlight-color: gray;
     --shadow-color: rgb(211 211 211 / 0.8);
     --button-background: silver;
     --inactive-color: lightgray;
@@ -137,11 +139,14 @@ editable-area textarea:focus {
 task-list ul {
   display: flex;
   flex-direction: column;
-  gap: 5px;
   wdith: 100%;
   list-style-type: none;
   margin: 0;
   padding: 0;
+}
+
+task-list ul {
+  padding: 4px 0;
 }
 
 task-list li:has(.checkbox input:checked) {
@@ -153,6 +158,10 @@ task-list-item .remove {
 }
 
 @media (hover: hover) and (pointer: fine) {
+  task-list li:hover {
+    background: var(--highlight-color);
+  }
+
   task-list li:hover .remove {
     visibility: visible;
   }
@@ -181,7 +190,11 @@ task-list-item {
   align-items: baseline;
 }
 
-task-list-item .handle button {
+task-list-item .handle {
+  margin: 2px 0;
+  padding: 4px 8px;
+  color: var(--button-text-color);
+  background: var(--button-background);
   cursor: grab;
 }
 

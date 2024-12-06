@@ -161,7 +161,15 @@ class TaskListItem extends HTMLElement {
     // drag and drop events
 
     this.parentNode.addEventListener("dragstart", (e) => {
-      this.parentNode.classList.add("dragging");
+      const isHandle = e.explicitOriginalTarget.closest
+        ? e.explicitOriginalTarget.closest(".handle")
+        : e.explicitOriginalTarget.parentNode.closest(".handle");
+
+      if (isHandle) {
+        this.parentNode.classList.add("dragging");
+      } else {
+        e.preventDefault();
+      }
     });
 
     this.parentNode.addEventListener("dragend", () => {
@@ -457,6 +465,12 @@ class NoteForm extends HTMLElement {
     this.saveButton = this.querySelector(".save");
 
     this.addEventListener("click", (e) => {
+      const textareaInside = e.target.querySelector("textarea");
+      if (textareaInside) {
+        textareaInside.focus();
+        return true;
+      }
+
       if (
         !(
           e.target instanceof HTMLInputElement ||
