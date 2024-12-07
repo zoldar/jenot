@@ -23,6 +23,11 @@ class EditableArea extends HTMLElement {
       this.#sync();
     });
 
+    new ResizeObserver(() => {
+      this.inputElement.style.height = this.displayElement.scrollHeight + "px";
+      this.inputElement.style.width = this.displayElement.scrollWidth + "px";
+    }).observe(this.displayElement);
+
     this.#updateReadonly();
     this.#sync();
   }
@@ -87,8 +92,6 @@ class EditableArea extends HTMLElement {
 
   #sync() {
     this.displayElement.replaceChildren(...renderText(this.inputElement.value));
-    this.inputElement.style.height = this.displayElement.scrollHeight + "px";
-    this.inputElement.style.width = this.displayElement.scrollWidth + "px";
   }
 }
 
