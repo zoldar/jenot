@@ -1,6 +1,6 @@
 // caching
 
-const cacheName = "jenot-v1";
+const cacheName = "jenot-v2";
 const appShellFiles = [
   "/index.html",
   "/style.css",
