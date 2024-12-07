@@ -19,7 +19,8 @@ const isLoggedIn = !!document.cookie
 // Notes storage configuration.
 // The storage is a combination of IndexedDB + network sync.
 // Network sync is only enabled is user is logged in.
-const Notes = new SyncedNoteStore("jenot-app", "notes", isLoggedIn && "/");
+const endpoint = isLoggedIn ? "/" : null;
+const Notes = new SyncedNoteStore("jenot-app", "notes", endpoint);
 
 // Reset metadata to force full sync
 if (URL_PARAMS.has("reset-meta")) {
