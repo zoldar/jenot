@@ -185,10 +185,15 @@ function renderNote(note) {
 
     note.content.forEach((task) => {
       const item = document.createElement("li");
+      if (task.checked) {
+        item.classList.add("checked");
+      }
       const check = document.createElement("p");
+      check.classList.add("checkbox");
       check.textContent = task.checked ? "☑" : "☐";
       item.appendChild(check);
       const itemContent = document.createElement("p");
+      itemContent.classList.add("content");
       itemContent.replaceChildren(...renderText(task.content));
       item.appendChild(itemContent);
       list.append(item);

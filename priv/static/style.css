@@ -280,6 +280,8 @@ button {
 }
 
 .note.readonly ul {
+  display: flex;
+  flex-direction: column;
   wdith: 100%;
   list-style-type: none;
   margin: 0;
@@ -293,8 +295,13 @@ button {
   margin-bottom: 4px;
 }
 
-task-list li:has(.checkbox input:checked) {
+.note.readonly ul li.checked {
   order: 1;
+}
+
+.note.readonly ul li.checked .content {
+  text-decoration: line-through;
+  color: var(--inactive-color);
 }
 
 .hidden {
