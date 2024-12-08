@@ -9,6 +9,18 @@ import {
 } from "./notifications.js";
 import "./components.js";
 
+async function resetApp() {
+  await window.navigator.serviceWorker
+    .getRegistration()
+    .then((r) => r.unregister());
+  await caches
+    .keys()
+    .then((keys) => Promise.all(keys.map((k) => caches.delete(k))));
+  window.location.reload();
+}
+
+document.querySelector("#reset-app").addEventListener("click", resetApp);
+
 const URL_PARAMS = new URLSearchParams(window.location.search);
 
 // Cookie presence determines login state
