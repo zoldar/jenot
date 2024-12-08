@@ -163,6 +163,10 @@ class TaskListItem extends HTMLElement {
 
     // drag and drop events
 
+    this.handleElement.addEventListener("mousedown", () => {
+      this.parentNode.setAttribute("draggable", "true");
+    });
+
     this.parentNode.addEventListener("dragstart", (e) => {
       const isHandle = e.explicitOriginalTarget.closest
         ? e.explicitOriginalTarget.closest(".handle")
@@ -176,6 +180,7 @@ class TaskListItem extends HTMLElement {
     });
 
     this.parentNode.addEventListener("dragend", () => {
+      this.parentNode.setAttribute("draggable", "false");
       this.parentNode.classList.remove("dragging");
       this.dispatchEvent(new Event("contentChange", { bubbles: true }));
     });
@@ -309,7 +314,6 @@ class TaskList extends HTMLElement {
 
       if (tasksCount === 1) {
         const newLI = document.createElement("li");
-        newLI.setAttribute("draggable", "true");
         const newItem = document.createElement("task-list-item");
         newLI.appendChild(newItem);
         this.querySelector("ul").appendChild(newLI);
@@ -341,7 +345,6 @@ class TaskList extends HTMLElement {
       const currentLI = e.target.parentNode;
 
       const newLI = document.createElement("li");
-      newLI.setAttribute("draggable", "true");
       const newItem = document.createElement("task-list-item");
       newItem.textContent = text;
       newLI.appendChild(newItem);
@@ -396,7 +399,7 @@ class TaskList extends HTMLElement {
 
     tasks.forEach((task) => {
       const item = html`
-        <li draggable="true"><task-list-item></task-list-itm></li>
+        <li><task-list-item></task-list-itm></li>
         `;
       this.listElement.appendChild(item);
       item.querySelector("task-list-item").value = task;
