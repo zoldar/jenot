@@ -95,6 +95,7 @@ if (notificationsAvailable()) {
 
 const newNote = document.querySelector("#new-note");
 const editNote = document.querySelector("#edit-note");
+const editNoteDialog = document.querySelector("#edit-note-dialog");
 
 // Each save event originating from storage triggers a re-render
 // of notes list.
@@ -113,17 +114,15 @@ newNote.addEventListener("addNote", async (e) => {
 });
 
 editNote.addEventListener("updateNote", async (e) => {
-  newNote.classList.remove("hidden");
-  editNote.classList.add("hidden");
   await Notes.update(e.detail);
   Notes.saveStorage();
+  editNoteDialog.close();
 });
 
 editNote.addEventListener("deleteNote", async (e) => {
-  newNote.classList.remove("hidden");
-  editNote.classList.add("hidden");
   await Notes.remove(e.detail);
   Notes.saveStorage();
+  editNoteDialog.close();
 });
 
 // The notes rendering routine is optimized to replace only
@@ -215,10 +214,9 @@ function renderNote(note) {
   }
 
   container.addEventListener("click", async (e) => {
-    newNote.classList.add("hidden");
-    editNote.classList.remove("hidden");
     const note = await Notes.get(container.id);
     editNote.load(note);
+    editNoteDialog.showModal();
   });
 
   return container;

@@ -77,7 +77,11 @@
         </div>
       </note-form>
 
-      <note-form mode="edit" id="edit-note" class="hidden">
+      <div id="notes"></div>
+    </div>
+
+    <dialog id="edit-note-dialog">
+      <note-form mode="edit" id="edit-note">
         <div class="note">
           <p class="content"></p>
           <div class="toolbar">
@@ -88,9 +92,7 @@
           </div>
         </div>
       </note-form>
-
-      <div id="notes"></div>
-    </div>
+    </dialog>
 
     <template id="task-list-item">
       <div class="handle">||</div>
