@@ -72,8 +72,21 @@
             <button class="add">➕</button>
             <button class="tasklist-mode">☑️</button>
             <button class="note-mode hidden">📑</button>
+            <button class="reminder">⏰ <span></span></button>
             <button class="remove">🗑️</button>
           </div>
+          <reminder-picker class="hidden">
+            <input class="date" type="date" />
+            <input class="time" type="time" />
+            <select class="repeat">
+              <option value="">Does not repeat</option>
+              <option value="day">Daily</option>
+              <option value="week">Weekly</option>
+              <option value="month">Monthly</option>
+              <option value="year">Yearly</option>
+            </select>
+            <button class="clear">X</button>
+          </reminder-picker>
         </div>
       </note-form>
 
@@ -88,8 +101,21 @@
             <button class="save">💾</button>
             <button class="tasklist-mode">☑️</button>
             <button class="note-mode">📑</button>
+            <button class="reminder">⏰ <span></span></button>
             <button class="remove">🗑️</button>
           </div>
+          <reminder-picker class="hidden">
+            <input class="date" type="date" />
+            <input class="time" type="time" />
+            <select class="repeat">
+              <option value="">Does not repeat</option>
+              <option value="day">Daily</option>
+              <option value="week">Weekly</option>
+              <option value="month">Monthly</option>
+              <option value="year">Yearly</option>
+            </select>
+            <button class="clear">X</button>
+          </reminder-picker>
         </div>
       </note-form>
     </dialog>

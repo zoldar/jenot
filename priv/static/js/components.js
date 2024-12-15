@@ -1,4 +1,99 @@
 import { renderText, html } from "./dom.js";
+import { reminderLabel } from "./reminders.js";
+
+// reminder-picker component
+
+class ReminderPicker extends HTMLElement {
+  constructor() {
+    super();
+    this.reminder = this.#new();
+  }
+
+  connectedCallback() {
+    this.dateInput = this.querySelector(".date");
+    this.timeInput = this.querySelector(".time");
+    this.repeatInput = this.querySelector(".repeat");
+    this.clearButton = this.querySelector(".clear");
+
+    const that = this;
+
+    this.dateInput.addEventListener("change", () => {
+      that.reminder.date = that.dateInput.value;
+
+      this.#emitUpdate();
+    });
+
+    this.timeInput.addEventListener("change", () => {
+      that.reminder.time = that.timeInput.value;
+
+      this.#emitUpdate();
+    });
+
+    this.repeatInput.addEventListener("change", () => {
+      that.reminder.unit = that.repeatInput.value;
+
+      this.#emitUpdate();
+    });
+
+    this.clearButton.addEventListener("click", () => {
+      this.reminder = this.#new();
+      this.reminder.enabled = false;
+      this.#updateUI();
+      this.#emitUpdate();
+    });
+
+    this.#updateUI();
+  }
+
+  enableDefault() {
+    this.reminder = this.#new();
+    this.reminder.enabled = true;
+    this.#updateUI();
+    this.#emitUpdate();
+  }
+
+  set value(reminder) {
+    this.reminder = reminder || this.#new();
+    this.#updateUI();
+  }
+
+  get value() {
+    return this.reminder;
+  }
+
+  get label() {
+    return reminderLabel(this.reminder);
+  }
+
+  #updateUI() {
+    this.dateInput.value = this.reminder.date;
+    this.timeInput.value = this.reminder.time;
+    this.repeatInput.value = this.reminder.unit;
+  }
+
+  #new() {
+    const now = new Date().toISOString();
+    const [date, rest] = now.split("T");
+    const fullTime = rest.split(".")[0];
+    const [hour, minute, _minute] = fullTime.split(":");
+
+    return {
+      enabled: false,
+      count: 1,
+      date: date,
+      time: `${hour}:${minute}`,
+      unit: "",
+    };
+  }
+
+  #emitUpdate() {
+    if (this.reminder.date && this.reminder.time) {
+      this.dispatchEvent(new Event("reminderUpdate", { bubbles: true }));
+    }
+  }
+}
+
+customElements.define("reminder-picker", ReminderPicker);
 
 // editable-area component
 
@@ -469,6 +564,9 @@ class NoteForm extends HTMLElement {
     this.removeButton = this.querySelector(".remove");
     this.addButton = this.querySelector(".add");
     this.saveButton = this.querySelector(".save");
+    this.reminderButton = this.querySelector(".reminder");
+    this.reminderButtonLabel = this.querySelector(".reminder span");
+    this.reminderPicker = this.querySelector("reminder-picker");
 
     this.addEventListener("click", (e) => {
       const textareaInside = e.target.querySelector("textarea");
@@ -517,6 +615,25 @@ class NoteForm extends HTMLElement {
       this.#reset();
     });
 
+    this.reminderButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.reminderPicker.classList.toggle("hidden");
+      // reset and enable the reminder when first clicking the
+      // reminder button and there's either no reminder set yet
+      // or it's disabled
+      if (
+        !this.note.reminder?.enabled &&
+        !this.reminderPicker.classList.contains("hidden")
+      ) {
+        this.reminderPicker.enableDefault();
+      }
+    });
+
+    this.addEventListener("reminderUpdate", () => {
+      this.note.reminder = this.reminderPicker.value;
+      this.#updateUI();
+    });
+
     if (this.mode === "add") {
       this.addButton.addEventListener("click", (e) => {
         e.preventDefault();
@@ -551,6 +668,7 @@ class NoteForm extends HTMLElement {
 
   load(note) {
     this.note = note;
+    this.reminderPicker.value = note.reminder;
     this.#updateUI();
     this.#setContent();
   }
@@ -559,13 +677,22 @@ class NoteForm extends HTMLElement {
     this.note = {
       type: "note",
       content: "",
+      reminder: null,
     };
+
+    this.reminderPicker.value = null;
 
     this.#updateUI();
     this.#setContent();
   }
 
   #updateUI() {
+    if (this.note.reminder?.enabled) {
+      this.reminderButtonLabel.textContent = reminderLabel(this.note.reminder);
+    } else {
+      this.reminderPicker.classList.add("hidden");
+      this.reminderButtonLabel.textContent = "";
+    }
     if (this.note.type === "note") {
       this.tasklistModeButton.classList.remove("hidden");
       this.noteModeButton.classList.add("hidden");

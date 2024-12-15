@@ -2,7 +2,7 @@ import { test, assert } from "./test-utils.js";
 import { SyncedNoteStore } from "./synced-store.js";
 
 test("synced store stores a note", async (_container, idx) => {
-  const store = new SyncedNoteStore(`jenot-app-test-${idx}`, "notes", "/", {
+  const store = new SyncedNoteStore(`jenot-app-test-${idx}`, "/", {
     add: () => null,
   });
 
@@ -24,7 +24,7 @@ test("synced store stores a note", async (_container, idx) => {
 test("synced store gets a note", async (_container, idx) => {
   let addCalled = false;
 
-  const store = new SyncedNoteStore(`jenot-app-test-${idx}`, "notes", "/", {
+  const store = new SyncedNoteStore(`jenot-app-test-${idx}`, "/", {
     add: () => (addCalled = true),
   });
 
@@ -44,7 +44,7 @@ test("synced store updates a note", async (_container, idx) => {
   let addCalled = false,
     updateCalled = false;
 
-  const store = new SyncedNoteStore(`jenot-app-test-${idx}`, "notes", "/", {
+  const store = new SyncedNoteStore(`jenot-app-test-${idx}`, "/", {
     add: () => (addCalled = true),
     update: () => (updateCalled = true),
   });

@@ -1,3 +1,35 @@
+let databases = {};
+
+async function connect(dbName) {
+  if (!databases[dbName]) {
+    databases[dbName] = await dbConnect(dbName);
+  }
+
+  return databases[dbName];
+}
+
+function dbConnect(dbName) {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(dbName, 1);
+
+    request.onsuccess = (e) => {
+      resolve(e.target.result);
+    };
+
+    request.onerror = (e) => {
+      console.error(`indexedDB error: ${e.target.errorCode}`);
+    };
+
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+
+      db.createObjectStore("notes", {
+        keyPath: "id",
+      });
+    };
+  });
+}
+
 class WebNoteStore {
   constructor(endpoint) {
     this.endpoint = endpoint || "/";
@@ -70,26 +102,26 @@ class WebNoteStore {
 }
 
 export class SyncedNoteStore extends EventTarget {
-  constructor(dbName, storeName, endpoint, webStore) {
+  constructor(dbName, endpoint, webStore) {
     super();
     this.dbName = dbName;
-    this.storeName = storeName;
+    this.storeName = "notes";
     this.db = null;
     this.webStore = webStore || (endpoint && new WebNoteStore(endpoint));
   }
 
   async all(since, includeDeleted) {
     const that = this;
-    return this.#connect().then(
+    return connect(this.dbName).then(
       (db) =>
         new Promise((resolve, reject) => {
           db
             .transaction([that.storeName], "readonly")
             .objectStore(that.storeName)
             .getAll().onsuccess = (data) => {
-            const results = data.target.result.filter(
-              (n) => (includeDeleted || !n.deleted) && n.id !== "meta",
-            ).toSorted((a, b) => b.created - a.created);
+            const results = data.target.result
+              .filter((n) => (includeDeleted || !n.deleted) && n.id !== "meta")
+              .toSorted((a, b) => b.created - a.created);
 
             if (since > 0) {
               return resolve(results.filter((n) => n.updated > since));
@@ -105,7 +137,7 @@ export class SyncedNoteStore extends EventTarget {
     const that = this;
     let result;
 
-    return this.#connect().then(
+    return connect(this.dbName).then(
       (db) =>
         new Promise(
           (resolve, reject) =>
@@ -134,11 +166,21 @@ export class SyncedNoteStore extends EventTarget {
       id: "id_" + now,
       type: note.type,
       content: note.content,
+      reminder: note.reminder
+        ? {
+            enabled: note.reminder.enabled,
+            date: note.reminder.date,
+            time: note.reminder.time,
+            repeat: note.reminder.count,
+            unit: note.reminder.unit,
+          }
+        : null,
       created: now,
       updated: now,
       deleted: null,
     };
-    return this.#connect()
+
+    return connect(this.dbName)
       .then(
         (db) =>
           new Promise(
@@ -151,7 +193,7 @@ export class SyncedNoteStore extends EventTarget {
       )
       .then(() => {
         (async () => this.webStore?.add(entry))();
-        return null;
+        return entry;
       });
   }
 
@@ -170,7 +212,7 @@ export class SyncedNoteStore extends EventTarget {
       note.updated = Date.now();
     }
 
-    return this.#connect()
+    return connect(this.dbName)
       .then(
         (db) =>
           new Promise(
@@ -183,7 +225,7 @@ export class SyncedNoteStore extends EventTarget {
       )
       .then(() => {
         (async () => (skipNetwork ? null : this.webStore?.add(note)))();
-        return null;
+        return note;
       });
   }
 
@@ -223,36 +265,5 @@ export class SyncedNoteStore extends EventTarget {
 
   saveStorage() {
     this.dispatchEvent(new CustomEvent("save"));
-  }
-
-  async #connect() {
-    if (!this.db) {
-      this.db = await this.#dbConnect();
-    }
-
-    return this.db;
-  }
-
-  #dbConnect() {
-    const that = this;
-
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, 1);
-
-      request.onsuccess = (e) => {
-        resolve(e.target.result);
-      };
-
-      request.onerror = (e) => {
-        console.error(`indexedDB error: ${e.target.errorCode}`);
-      };
-
-      request.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        db.createObjectStore(that.storeName, {
-          keyPath: "id",
-        });
-      };
-    });
   }
 }

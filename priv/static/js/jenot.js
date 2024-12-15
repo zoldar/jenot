@@ -8,6 +8,7 @@ import {
   sendNotification,
 } from "./notifications.js";
 import "./components.js";
+import { reminderLabel } from "./reminders.js";
 
 async function resetApp() {
   await window.navigator.serviceWorker
@@ -32,7 +33,7 @@ const isLoggedIn = !!document.cookie
 // The storage is a combination of IndexedDB + network sync.
 // Network sync is only enabled is user is logged in.
 const endpoint = isLoggedIn ? "/" : null;
-const Notes = new SyncedNoteStore("jenot-app", "notes", endpoint);
+const Notes = new SyncedNoteStore("jenot-app", endpoint);
 
 // Reset metadata to force full sync
 if (URL_PARAMS.has("reset-meta")) {
@@ -211,6 +212,14 @@ function renderNote(note) {
     });
 
     container.appendChild(list);
+  }
+
+  if (note.reminder?.enabled) {
+    const labelText = reminderLabel(note.reminder);
+    const reminderBadge = document.createElement("span");
+    reminderBadge.classList.add("reminder-label");
+    reminderBadge.textContent = `⏲ ${labelText}`;
+    container.appendChild(reminderBadge);
   }
 
   container.addEventListener("click", async (e) => {
