@@ -25,6 +25,10 @@
     --button-background: silver;
     --inactive-color: lightgray;
   }
+
+  html {
+    color-scheme: dark;
+  }
 }
 
 /* CSS reset */
