@@ -12,6 +12,7 @@ defmodule Jenot.Note do
     field(:deleted_at, :utc_datetime_usec)
 
     belongs_to(:account, Jenot.Account, type: :binary_id)
+    has_one(:reminder, Jenot.Reminder)
 
     field(:server_updated_at, :utc_datetime_usec)
     timestamps(type: :utc_datetime_usec)

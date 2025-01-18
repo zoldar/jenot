@@ -6,7 +6,9 @@ defmodule Jenot.MixProject do
       app: :jenot,
       version: "0.1.0",
       elixir: "~> 1.17",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps(),
       releases: releases()
     ]
@@ -18,6 +20,11 @@ defmodule Jenot.MixProject do
       mod: {Jenot.Application, []}
     ]
   end
+
+  defp elixirc_paths(env) when env in [:test, :dev],
+    do: ["lib", "test/support"]
+
+  defp elixirc_paths(_), do: ["lib"]
 
   def releases do
     [
@@ -42,6 +49,14 @@ defmodule Jenot.MixProject do
       {:web_push_elixir, "~> 0.4.0"},
       {:ecto_sqlite3, "~> 0.17"},
       {:plug_live_reload, "~> 0.1.0", only: :dev}
+    ]
+  end
+
+  defp aliases do
+    [
+      setup: ["deps.get", "ecto.create", "ecto.migrate"],
+      "ecto.reset": ["ecto.drop", "ecto.create", "ecto.migrate"],
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end

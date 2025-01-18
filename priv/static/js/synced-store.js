@@ -172,7 +172,7 @@ export class SyncedNoteStore extends EventTarget {
             date: note.reminder.date,
             time: note.reminder.time,
             repeat: note.reminder.count,
-            unit: note.reminder.unit,
+            unit: note.reminder.unit != "" ? note.reminder.unit : null,
           }
         : null,
       created: now,
