@@ -1,4 +1,5 @@
 let databases = {};
+let memory = {};
 
 async function connect(dbName) {
   if (!databases[dbName]) {
@@ -110,8 +111,20 @@ export class SyncedNoteStore extends EventTarget {
     this.webStore = webStore || (endpoint && new WebNoteStore(endpoint));
   }
 
-  async all(since, includeDeleted) {
+  async init() {
+    await this.fetchAll().then((allNotes) => {
+      memory[this.dbName] = {};
+      memory[this.dbName][this.storeName] = {};
+
+      allNotes.forEach((note) => {
+        memory[this.dbName][this.storeName][note.id] = note;
+      });
+    });
+  }
+
+  async fetchAll() {
     const that = this;
+
     return connect(this.dbName).then(
       (db) =>
         new Promise((resolve, reject) => {
@@ -119,34 +132,26 @@ export class SyncedNoteStore extends EventTarget {
             .transaction([that.storeName], "readonly")
             .objectStore(that.storeName)
             .getAll().onsuccess = (data) => {
-            const results = data.target.result
-              .filter((n) => (includeDeleted || !n.deleted) && n.id !== "meta")
-              .toSorted((a, b) => b.created - a.created);
-
-            if (since > 0) {
-              return resolve(results.filter((n) => n.updated > since));
-            }
-
-            return resolve(results);
+            return resolve(data.target.result);
           };
         }),
     );
   }
 
-  async get(id) {
-    const that = this;
-    let result;
+  async all(since, includeDeleted) {
+    const results = Object.values(memory[this.dbName][this.storeName])
+      .filter((n) => (includeDeleted || !n.deleted) && n.id !== "meta")
+      .toSorted((a, b) => b.created - a.created);
 
-    return connect(this.dbName).then(
-      (db) =>
-        new Promise(
-          (resolve, reject) =>
-            (db
-              .transaction([that.storeName], "readonly")
-              .objectStore(that.storeName)
-              .get(id).onsuccess = (data) => resolve(data.target.result)),
-        ),
-    );
+    if (since > 0) {
+      return results.filter((n) => n.updated > since);
+    }
+
+    return results;
+  }
+
+  async get(id) {
+    return memory[this.dbName][this.storeName][id];
   }
 
   async getMeta() {
@@ -192,7 +197,10 @@ export class SyncedNoteStore extends EventTarget {
           ),
       )
       .then(() => {
-        (async () => this.webStore?.add(entry))();
+        memory[this.dbName][this.storeName][entry.id] = structuredClone(entry);
+
+        this.webStore?.add(entry);
+
         return entry;
       });
   }
@@ -224,7 +232,10 @@ export class SyncedNoteStore extends EventTarget {
           ),
       )
       .then(() => {
-        (async () => (skipNetwork ? null : this.webStore?.add(note)))();
+        memory[this.dbName][this.storeName][note.id] = structuredClone(note);
+
+        if (!skipNetwork) this.webStore?.add(note);
+
         return note;
       });
   }

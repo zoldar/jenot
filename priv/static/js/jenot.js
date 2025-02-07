@@ -34,6 +34,7 @@ const isLoggedIn = !!document.cookie
 // Network sync is only enabled is user is logged in.
 const endpoint = isLoggedIn ? "/" : null;
 const Notes = new SyncedNoteStore("jenot-app", endpoint);
+await Notes.init();
 
 // Reset metadata to force full sync
 if (URL_PARAMS.has("reset-meta")) {
@@ -181,7 +182,7 @@ async function render() {
   });
 
   currentNotes = {};
-  notes.forEach((n) => (currentNotes[n.id] = n));
+  notes.forEach((n) => (currentNotes[n.id] = structuredClone(n)));
 }
 
 function renderNote(note) {
