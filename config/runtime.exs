@@ -2,6 +2,10 @@ import Config
 
 config :jenot, host: System.fetch_env!("HOST")
 
+port = if config_env() == :test, do: 4001, else: 4000
+
+config :jenot, port: port
+
 config :jenot, secret_key_base: System.fetch_env!("SECRET_KEY_BASE")
 
 config :jenot, secure_cookie: System.fetch_env!("SECURE_COOKIE") == "true"

@@ -9,7 +9,7 @@ defmodule Jenot.Application do
 
     children = [
       Jenot.Repo,
-      {Bandit, plug: Jenot.Web, scheme: :http, port: 4000}
+      {Bandit, plug: Jenot.Web, scheme: :http, port: Application.fetch_env!(:jenot, :port)}
     ]
 
     opts = [strategy: :one_for_one, name: Jenot.Supervisor]
