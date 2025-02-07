@@ -62,7 +62,7 @@ body {
 }
 
 body:has(dialog[open]) {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 img,
