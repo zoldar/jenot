@@ -5,6 +5,7 @@ function notesEqual(n1, n2) {
   return (
     n1.id === n2.id &&
     n1.type === n2.type &&
+    n1.title === n2.title &&
     n1.content === n2.content &&
     n1.deleted === n2.deleted &&
     n1.reminder?.enabled === n2.reminder?.enabled &&
@@ -119,6 +120,7 @@ class WebNoteStore {
 const draftTemplate = {
   id: "draft",
   type: "note",
+  title: "",
   content: "",
   reminder: null,
 };
@@ -209,6 +211,7 @@ export class SyncedNoteStore extends EventTarget {
     const entry = {
       id: "id_" + now,
       type: note.type,
+      title: note.title,
       content: note.content,
       reminder: note.reminder
         ? {

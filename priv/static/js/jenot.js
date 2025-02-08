@@ -209,10 +209,21 @@ function renderNote(note) {
   container.classList.add("note");
   container.classList.add("readonly");
 
+  if (note.title && note.title !== "") {
+    const title = document.createElement("p");
+    title.classList.add("title");
+    title.replaceChildren(...renderText(note.title));
+    container.appendChild(title);
+  }
+
   if (note.type === "note") {
-    container.replaceChildren(...renderText(note.content));
+    const body = document.createElement("p");
+    body.classList.add("body");
+    body.replaceChildren(...renderText(note.content));
+    container.appendChild(body);
   } else if (note.type === "tasklist") {
     const list = document.createElement("ul");
+    list.classList.add("body");
 
     note.content.forEach((task) => {
       const item = document.createElement("li");

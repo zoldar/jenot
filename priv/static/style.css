@@ -243,6 +243,16 @@ task-list ul {
 
 /* Note form */
 
+note-form:focus-within .title {
+  display: block;
+}
+
+note-form .title {
+  display: none;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
 note-form .content {
   min-height: 2.5em;
 }
@@ -300,6 +310,11 @@ button {
   background: var(--note-background);
   box-shadow: 2px 2px 4px 0px var(--shadow-color);
   padding: 4px 8px;
+}
+
+.note.readonly .title {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
 .note.readonly ul {

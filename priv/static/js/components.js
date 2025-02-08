@@ -552,6 +552,7 @@ class NoteForm extends HTMLElement {
 
     this.note = {
       type: "note",
+      title: "",
       content: "",
       reminder: null,
     };
@@ -559,6 +560,7 @@ class NoteForm extends HTMLElement {
 
   connectedCallback() {
     this.mode = this.attributes.mode.value;
+    this.titleField = this.querySelector(".title");
     this.content = this.querySelector(".content");
     this.tasklistModeButton = this.querySelector(".tasklist-mode");
     this.noteModeButton = this.querySelector(".note-mode");
@@ -656,10 +658,12 @@ class NoteForm extends HTMLElement {
     }
 
     this.addEventListener("contentChange", () => {
+      this.#setNote("title", this.titleField.firstChild.value);
       this.#setNote("content", this.content.firstChild.value);
     });
 
     this.#updateUI();
+    this.#setTitle();
     this.#setContent();
   }
 
@@ -667,12 +671,14 @@ class NoteForm extends HTMLElement {
     this.note = note;
     this.reminderPicker.value = note.reminder;
     this.#updateUI();
+    this.#setTitle();
     this.#setContent();
   }
 
   #reset() {
     this.note = {
       type: "note",
+      title: "",
       content: "",
       reminder: null,
     };
@@ -680,6 +686,7 @@ class NoteForm extends HTMLElement {
     this.reminderPicker.value = null;
 
     this.#updateUI();
+    this.#setTitle();
     this.#setContent();
   }
 
@@ -721,6 +728,12 @@ class NoteForm extends HTMLElement {
       this.tasklistModeButton.classList.add("hidden");
       this.noteModeButton.classList.remove("hidden");
     }
+  }
+
+  #setTitle() {
+    const title = html`<editable-area></editable-area>`;
+    this.titleField.replaceChildren(title);
+    title.value = this.note.title;
   }
 
   #setContent() {
