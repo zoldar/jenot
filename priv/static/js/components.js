@@ -697,6 +697,13 @@ class NoteForm extends HTMLElement {
           detail: this.note,
         }),
       );
+    } else {
+      this.dispatchEvent(
+        new CustomEvent("updateNoteInProgress", {
+          bubbles: true,
+          detail: this.note,
+        }),
+      );
     }
   }
 

@@ -127,6 +127,12 @@ newNote.addEventListener("deleteNote", async (e) => {
   await Notes.clearDraft();
 });
 
+editNote.addEventListener("updateNoteInProgress", async (e) => {
+  const note = e.detail;
+  note.updated = Date.now();
+  await Notes.update(note, true);
+});
+
 editNote.addEventListener("updateNote", async (e) => {
   await Notes.update(e.detail);
   Notes.saveStorage();
