@@ -154,7 +154,10 @@ export class SyncedNoteStore extends EventTarget {
 
   async all(since, includeDeleted) {
     const results = Object.values(memory[this.dbName][this.storeName])
-      .filter((n) => (includeDeleted || !n.deleted) && n.id !== "meta")
+      .filter(
+        (n) =>
+          (includeDeleted || !n.deleted) && n.id !== "meta" && n.id !== "draft",
+      )
       .toSorted((a, b) => b.created - a.created);
 
     if (since > 0) {
