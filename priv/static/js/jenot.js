@@ -253,9 +253,11 @@ function renderNote(note) {
   }
 
   container.addEventListener("click", async (e) => {
-    const note = await Notes.get(container.id);
-    editNote.load(structuredClone(note));
-    editNoteDialog.showModal();
+    if (e.target.tagName !== "A") {
+      const note = await Notes.get(container.id);
+      editNote.load(structuredClone(note));
+      editNoteDialog.showModal();
+    }
   });
 
   return container;
