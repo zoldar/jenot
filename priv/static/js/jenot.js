@@ -225,7 +225,7 @@ function renderNote(note) {
 
   container.addEventListener("click", async (e) => {
     const note = await Notes.get(container.id);
-    editNote.load(note);
+    editNote.load(structuredClone(note));
     editNoteDialog.showModal();
   });
 

@@ -1,6 +1,20 @@
 let databases = {};
 let memory = {};
 
+function notesEqual(n1, n2) {
+  return (
+    n1.id === n2.id &&
+    n1.type === n2.type &&
+    n1.content === n2.content &&
+    n1.deleted === n2.deleted &&
+    n1.reminder?.enabled === n2.reminder?.enabled &&
+    n1.reminder?.date === n2.reminder?.date &&
+    n1.reminder?.time === n2.reminder?.time &&
+    n1.reminder?.repeat === n2.reminder?.repeat &&
+    n1.reminder?.unit === n2.reminder?.unit
+  );
+}
+
 async function connect(dbName) {
   if (!databases[dbName]) {
     databases[dbName] = await dbConnect(dbName);
@@ -215,6 +229,12 @@ export class SyncedNoteStore extends EventTarget {
 
   async update(note, skipNetwork) {
     const that = this;
+
+    const existingNote = memory[this.dbName][this.storeName][note.id];
+
+    if (existingNote && notesEqual(note, existingNote)) {
+      return existingNote;
+    }
 
     if (!skipNetwork) {
       note.updated = Date.now();
