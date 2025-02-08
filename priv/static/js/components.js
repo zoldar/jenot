@@ -553,6 +553,7 @@ class NoteForm extends HTMLElement {
     this.note = {
       type: "note",
       content: "",
+      reminder: null,
     };
   }
 
@@ -590,28 +591,24 @@ class NoteForm extends HTMLElement {
 
     this.tasklistModeButton.addEventListener("click", (e) => {
       e.preventDefault();
-      this.note.type = "tasklist";
-      this.#setContent();
+      this.#setNote("type", "tasklist");
       this.#updateUI();
     });
 
     this.noteModeButton.addEventListener("click", (e) => {
       e.preventDefault();
-      this.note.type = "note";
-      this.#setContent();
+      this.#setNote("type", "note");
       this.#updateUI();
     });
 
     this.removeButton.addEventListener("click", (e) => {
       e.preventDefault();
-      if (this.mode === "edit") {
-        this.dispatchEvent(
-          new CustomEvent("deleteNote", {
-            bubbles: true,
-            detail: this.note,
-          }),
-        );
-      }
+      this.dispatchEvent(
+        new CustomEvent("deleteNote", {
+          bubbles: true,
+          detail: this.note,
+        }),
+      );
       this.#reset();
     });
 
@@ -630,7 +627,7 @@ class NoteForm extends HTMLElement {
     });
 
     this.addEventListener("reminderUpdate", () => {
-      this.note.reminder = this.reminderPicker.value;
+      this.#setNote("reminder", this.reminderPicker.value);
       this.#updateUI();
     });
 
@@ -659,7 +656,7 @@ class NoteForm extends HTMLElement {
     }
 
     this.addEventListener("contentChange", () => {
-      this.note.content = this.content.firstChild.value;
+      this.#setNote("content", this.content.firstChild.value);
     });
 
     this.#updateUI();
@@ -684,6 +681,23 @@ class NoteForm extends HTMLElement {
 
     this.#updateUI();
     this.#setContent();
+  }
+
+  #setNote(field, value) {
+    this.note[field] = value;
+
+    if (field === "type") {
+      this.#setContent();
+    }
+
+    if (this.mode === "add") {
+      this.dispatchEvent(
+        new CustomEvent("updateDraft", {
+          bubbles: true,
+          detail: this.note,
+        }),
+      );
+    }
   }
 
   #updateUI() {

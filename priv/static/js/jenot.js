@@ -47,7 +47,7 @@ if (URL_PARAMS.has("reset-meta")) {
 }
 
 // Very rudimentary periodic sync. It will be refactored into a more real-time
-// solution using either websocket of long-polling, so that server can notify about
+// solution using either websocket or long-polling, so that server can notify about
 // new data to sync.
 const sync = async () => {
   await Notes.sync();
@@ -99,6 +99,9 @@ const newNote = document.querySelector("#new-note");
 const editNote = document.querySelector("#edit-note");
 const editNoteDialog = document.querySelector("#edit-note-dialog");
 
+// Load draft into new note
+newNote.load(structuredClone(await Notes.getDraft()));
+
 // Each save event originating from storage triggers a re-render
 // of notes list.
 Notes.addEventListener("save", render.bind(this));
@@ -112,7 +115,16 @@ if (isLoggedIn) {
 // note-form component specific event handlers
 newNote.addEventListener("addNote", async (e) => {
   await Notes.add(e.detail);
+  await Notes.clearDraft();
   Notes.saveStorage();
+});
+
+newNote.addEventListener("updateDraft", async (e) => {
+  await Notes.setDraft(e.detail);
+});
+
+newNote.addEventListener("deleteNote", async (e) => {
+  await Notes.clearDraft();
 });
 
 editNote.addEventListener("updateNote", async (e) => {

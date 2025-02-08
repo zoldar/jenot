@@ -116,6 +116,13 @@ class WebNoteStore {
   }
 }
 
+const draftTemplate = {
+  id: "draft",
+  type: "note",
+  content: "",
+  reminder: null,
+};
+
 export class SyncedNoteStore extends EventTarget {
   constructor(dbName, endpoint, webStore) {
     super();
@@ -169,6 +176,21 @@ export class SyncedNoteStore extends EventTarget {
 
   async get(id) {
     return memory[this.dbName][this.storeName][id];
+  }
+
+  async getDraft() {
+    return this.get("draft").then(
+      (draft) => draft || structuredClone(draftTemplate),
+    );
+  }
+
+  async setDraft(draft) {
+    draft.id = "draft";
+    return this.update(draft, true);
+  }
+
+  async clearDraft() {
+    return this.update(structuredClone(draftTemplate), true);
   }
 
   async getMeta() {
