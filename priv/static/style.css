@@ -11,6 +11,7 @@
   --shadow-color: rgb(0 0 0 / 0.8);
   --button-background: lightgray;
   --inactive-color: gray;
+  --placeholder-text: #999;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,6 +25,7 @@
     --shadow-color: rgb(211 211 211 / 0.8);
     --button-background: silver;
     --inactive-color: lightgray;
+    --placeholder-text: #999;
   }
 
   html {
@@ -243,7 +245,8 @@ task-list ul {
 
 /* Note form */
 
-note-form:focus-within .title {
+note-form:focus-within .title,
+note-form .title:has(.non-empty) {
   display: block;
 }
 
@@ -251,6 +254,11 @@ note-form .title {
   display: none;
   font-size: 1.2em;
   font-weight: bold;
+}
+
+note-form .title .empty .display::before {
+  content: "Title";
+  color: var(--placeholder-text);
 }
 
 note-form .content {

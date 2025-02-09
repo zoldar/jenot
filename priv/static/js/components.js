@@ -186,7 +186,17 @@ class EditableArea extends HTMLElement {
   }
 
   #sync() {
-    this.displayElement.replaceChildren(...renderText(this.inputElement.value));
+    const value = this.inputElement.value;
+
+    if (value.trim() === "") {
+      this.classList.add("empty");
+      this.classList.remove("non-empty");
+    } else {
+      this.classList.remove("empty");
+      this.classList.add("non-empty");
+    }
+
+    this.displayElement.replaceChildren(...renderText(value));
   }
 }
 
