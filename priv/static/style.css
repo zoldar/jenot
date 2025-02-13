@@ -299,10 +299,13 @@ button {
   /* width: 270px; */
   max-width: 1200px;
   margin: var(--gap-1) auto 0 auto;
-  padding: 0 var(--gap-1);
 }
 
 #top-bar {
+  position: sticky;
+  top: -1px;
+  padding-bottom: 0.4em;
+  background: var(--background);
   display: flex;
   flex-direction: row-reverse;
   gap: var(--gap-1);
