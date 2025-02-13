@@ -92,6 +92,36 @@ if (notificationsAvailable()) {
   });
 }
 
+// Search
+
+let filter = "";
+const search = document.querySelector("#search");
+
+search.addEventListener("input", (e) => {
+  filter = e.target.value.trim().toLowerCase();
+  Notes.saveStorage();
+});
+
+function filterNotes(notes) {
+  if (filter !== "") {
+    return notes.filter(
+      (n) =>
+        n.title.toLowerCase().indexOf(filter) > -1 ||
+        textOf(n.content).toLowerCase().indexOf(filter) > -1,
+    );
+  }
+
+  return notes;
+}
+
+function textOf(content) {
+  if (typeof content === "object") {
+    return content.map((n) => n.content).join("");
+  } else {
+    return content;
+  }
+}
+
 // There are two note-form component instances - one for
 // composing new notes and another one for editing existing notes.
 
@@ -155,7 +185,8 @@ function notesEqual(note1, note2) {
 }
 
 async function render() {
-  const notes = await Notes.all();
+  const allNotes = await Notes.all();
+  const notes = filterNotes(allNotes);
   const notesContainer = document.querySelector("#notes");
 
   let previousId = null;

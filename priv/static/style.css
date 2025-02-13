@@ -311,6 +311,11 @@ button {
   gap: var(--gap-1);
 }
 
+#search {
+  width: 10em;
+  min-width: 0;
+}
+
 #notes {
   display: flex;
   flex-direction: column;
