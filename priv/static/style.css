@@ -176,7 +176,11 @@ task-list li:has(.checkbox input:checked) {
 }
 
 task-list-item .remove {
-  visibility: hidden;
+  width: 3em;
+}
+
+task-list-item .remove button {
+  display: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -184,17 +188,17 @@ task-list-item .remove {
     background: var(--highlight-color);
   }
 
-  task-list li:hover .remove {
-    visibility: visible;
+  task-list li:hover .remove button {
+    display: block;
   }
 }
 
-task-list-item .remove:has(button:active) {
-  visibility: visible;
+task-list-item .remove button:active {
+  display: block;
 }
 
-task-list-item:has(textarea:focus) .remove {
-  visibility: visible;
+task-list-item:has(textarea:focus) .remove button {
+  display: block;
 }
 
 task-list-item .checkbox input {
