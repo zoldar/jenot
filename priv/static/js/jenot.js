@@ -166,13 +166,13 @@ editNote.addEventListener("updateNoteInProgress", async (e) => {
 editNote.addEventListener("updateNote", async (e) => {
   await Notes.update(e.detail);
   Notes.saveStorage();
-  editNoteDialog.close();
+  closeModal(editNoteDialog);
 });
 
 editNote.addEventListener("deleteNote", async (e) => {
   await Notes.remove(e.detail);
   Notes.saveStorage();
-  editNoteDialog.close();
+  closeModal(editNoteDialog);
 });
 
 // The notes rendering routine is optimized to replace only
@@ -234,6 +234,22 @@ async function render() {
   notes.forEach((n) => (currentNotes[n.id] = structuredClone(n)));
 }
 
+function openModal(modal) {
+  document.body.style.top = `-${window.scrollY}px`;
+  document.body.style.position = "fixed";
+
+  modal.showModal();
+}
+
+function closeModal(modal) {
+  modal.close();
+
+  const scrollY = document.body.style.top;
+  document.body.style.position = "";
+  document.body.style.top = "";
+  window.scrollTo(0, parseInt(scrollY || "0") * -1);
+}
+
 function renderNote(note) {
   const container = document.createElement("div");
   container.id = note.id;
@@ -287,7 +303,7 @@ function renderNote(note) {
     if (e.target.tagName !== "A") {
       const note = await Notes.get(container.id);
       editNote.load(structuredClone(note));
-      editNoteDialog.showModal();
+      openModal(editNoteDialog);
     }
   });
 
