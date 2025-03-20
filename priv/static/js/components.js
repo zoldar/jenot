@@ -582,7 +582,7 @@ class NoteForm extends HTMLElement {
     this.reminderPicker = this.querySelector("reminder-picker");
 
     this.addEventListener("click", (e) => {
-      const textareaInside = e.target.querySelector("textarea");
+      const textareaInside = e.target.querySelectorAll("textarea")[1];
       if (textareaInside) {
         textareaInside.focus();
         return true;
