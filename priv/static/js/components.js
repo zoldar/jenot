@@ -118,6 +118,18 @@ class EditableArea extends HTMLElement {
       this.#sync();
     });
 
+    const onTouchMove = () => {
+      this.inputElement.blur();
+    };
+
+    this.inputElement.addEventListener("focus", () => {
+      document.addEventListener("touchmove", onTouchMove);
+    });
+
+    this.inputElement.addEventListener("blur", () => {
+      document.removeEventLitener("touchmove", onTouchMove);
+    });
+
     new ResizeObserver(() => {
       this.inputElement.style.height = this.displayElement.scrollHeight + "px";
       this.inputElement.style.width = this.displayElement.scrollWidth + "px";
