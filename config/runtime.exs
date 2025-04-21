@@ -1,6 +1,6 @@
 import Config
 
-config :jenot, host: System.fetch_env!("HOST")
+config :jenot, host: System.fetch_env!("WEB_HOST")
 
 port = if config_env() == :test, do: 4001, else: 4000
 
