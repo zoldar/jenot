@@ -251,7 +251,7 @@ defmodule Jenot.Notes do
 
   defp upsert_note(changeset, opts) do
     conflict_target = Keyword.fetch!(opts, :target)
-    type = Ecto.Changeset.get_field(changeset, :type) || :note
+    type = to_string(Ecto.Changeset.get_field(changeset, :type) || :note)
     title = Ecto.Changeset.get_field(changeset, :title) || ""
     content = Ecto.Changeset.get_field(changeset, :content) || ""
     deleted_at = Ecto.Changeset.get_field(changeset, :deleted_at)

@@ -7,7 +7,7 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
       add :name, :text, null: false
       add :code_digest, :text, null: false
 
-      timestamps(type: :datetime_usec)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create table(:notes, primary_key: false) do
@@ -16,12 +16,12 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
       add :type, :text, null: false
       add :title, :text, null: false, default: ""
       add :content, :text, null: false, default: ""
-      add :deleted_at, :datetime_usec
+      add :deleted_at, :utc_datetime_usec
 
-      add :account_id, references(:accounts, on_delete: :delete_all), null: false
+      add :account_id, references(:accounts, on_delete: :delete_all, type: :uuid), null: false
 
-      add :server_updated_at, :datetime_usec, null: false
-      timestamps(type: :datetime_usec)
+      add :server_updated_at, :utc_datetime_usec, null: false
+      timestamps(type: :utc_datetime_usec)
     end
 
     create index(:notes, [:account_id])
@@ -36,9 +36,9 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
 
       add :hash, :text, null: false
 
-      add :account_id, references(:accounts, on_delete: :delete_all), null: false
+      add :account_id, references(:accounts, on_delete: :delete_all, type: :uuid), null: false
 
-      timestamps(type: :datetime_usec)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create index(:subscriptions, [:account_id])
@@ -53,11 +53,11 @@ defmodule Jenot.Repo.Migrations.InitialSchema do
       add :repeat_period, :text
       add :repeat_count, :integer
 
-      add :deleted_at, :datetime_usec
+      add :deleted_at, :utc_datetime_usec
 
-      add :note_id, references(:note, on_delete: :delete_all), null: false
+      add :note_id, references(:notes, on_delete: :delete_all, type: :uuid), null: false
 
-      timestamps(type: :datetime_usec)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create index(:reminders, [:note_id])

@@ -1,7 +1,7 @@
 import Config
 
 config :jenot, Jenot.Repo,
-  database: "priv/db_test.sqlite",
+  url: "postgres://postgres:postgres@localhost/jenot_test",
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :logger, :default_handler, level: :warning

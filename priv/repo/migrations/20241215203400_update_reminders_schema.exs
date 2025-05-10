@@ -11,9 +11,9 @@ defmodule Jenot.Repo.Migrations.UpdateRemindersSchema do
       add :unit, :text, null: true
       add :enabled, :boolean, null: false
 
-      add :note_id, references(:notes, on_delete: :delete_all, type: :binary_id), primary_key: true
+      add :note_id, references(:notes, on_delete: :delete_all, type: :uuid), primary_key: true
 
-      timestamps(type: :datetime_usec)
+      timestamps(type: :utc_datetime_usec)
     end
   end
 

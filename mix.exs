@@ -47,7 +47,9 @@ defmodule Jenot.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:hahash, "~> 0.2.0"},
       {:web_push_elixir, "~> 0.4.0"},
-      {:ecto_sqlite3, "~> 0.17"},
+      {:ecto, "~> 3.10"},
+      {:ecto_sql, "~> 3.0"},
+      {:postgrex, ">= 0.0.0"},
       {:plug_live_reload, "~> 0.1.0", only: :dev}
     ]
   end

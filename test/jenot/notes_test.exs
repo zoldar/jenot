@@ -35,7 +35,7 @@ defmodule Jenot.NotesTest do
       assert {:ok, note} =
                Notes.add(account, %{
                  "id" => "id_#{timestamp}",
-                 "type" => "tasklist",
+                 "type" => :tasklist,
                  "content" => [
                    %{checked: true, content: "First task"},
                    %{checked: false, content: "Second task"}
