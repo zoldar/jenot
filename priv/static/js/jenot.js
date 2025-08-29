@@ -9,6 +9,38 @@ import {
 } from "./notifications.js";
 import "./components.js";
 import { reminderLabel } from "./reminders.js";
+import { Router } from "./router.js";
+
+// Cookie presence determines login state
+const isLoggedIn = !!document.cookie
+  .split("; ")
+  .find((row) => row.startsWith("jenot_pub="));
+
+// Notes storage configuration.
+// The storage is a combination of IndexedDB + network sync.
+// Network sync is only enabled is user is logged in.
+const endpoint = isLoggedIn ? "/" : null;
+const Notes = new SyncedNoteStore("jenot-app", endpoint);
+
+let view = "home";
+
+const routes = [
+  {
+    path: "index.html#home",
+    callback: () => {
+      view = "home";
+      render();
+    },
+  },
+  {
+    path: "index.html#reminders",
+    callback: () => {
+      view = "reminders";
+      render();
+    },
+  },
+  { path: "*", callback: (router) => router.redirect("index.html#home") },
+];
 
 async function resetApp() {
   await window.navigator.serviceWorker
@@ -24,16 +56,6 @@ document.querySelector("#reset-app").addEventListener("click", resetApp);
 
 const URL_PARAMS = new URLSearchParams(window.location.search);
 
-// Cookie presence determines login state
-const isLoggedIn = !!document.cookie
-  .split("; ")
-  .find((row) => row.startsWith("jenot_pub="));
-
-// Notes storage configuration.
-// The storage is a combination of IndexedDB + network sync.
-// Network sync is only enabled is user is logged in.
-const endpoint = isLoggedIn ? "/" : null;
-const Notes = new SyncedNoteStore("jenot-app", endpoint);
 await Notes.init();
 
 // Reset metadata to force full sync
@@ -184,7 +206,16 @@ function notesEqual(note1, note2) {
   return note1.id === note2.id && note1.updated === note2.updated;
 }
 
-async function render() {
+async function renderReminders() {
+  const allNotes = await Notes.all();
+  const reminderNotes = allNotes.filter((n) => n.reminder?.enabled);
+  const notes = filterNotes(reminderNotes).toSorted(
+    (a, b) => b.reminder.date - a.reminder.date,
+  );
+  const notesContainer = document.querySelector("#reminders");
+}
+
+async function renderHome() {
   const allNotes = await Notes.all();
   const notes = filterNotes(allNotes);
   const notesContainer = document.querySelector("#notes");
@@ -232,6 +263,19 @@ async function render() {
 
   currentNotes = {};
   notes.forEach((n) => (currentNotes[n.id] = structuredClone(n)));
+}
+
+async function render() {
+  switch (view) {
+    case "home":
+      renderHome();
+      break;
+    case "reminders":
+      renderReminders();
+      break;
+    default:
+      renderError();
+  }
 }
 
 function openModal(modal) {
@@ -309,3 +353,5 @@ function renderNote(note) {
 
   return container;
 }
+
+const router = Router.init(routes);

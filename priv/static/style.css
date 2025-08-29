@@ -53,6 +53,10 @@ dialog {
   max-height: 90vh;
 }
 
+/* dialog[open] { */
+/*   oversrcoll-behavior-y: contain; */
+/* } */
+
 ::backdrop {
   background: var(--backdrop-background);
   opacity: 0.75;
