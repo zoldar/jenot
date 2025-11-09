@@ -145,6 +145,7 @@ editable-area textarea {
   font-size: inherit;
   font-family: inherit;
   line-height: inherit;
+  line-break: inherit;
   text-indent: inherit;
   letter-spacing: inherit;
   padding: 0;
