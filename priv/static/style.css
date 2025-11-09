@@ -249,11 +249,11 @@ task-list ul {
 
 note-form:focus-within .title,
 note-form .title:has(.non-empty) {
-  display: block;
+  visibility: visible;
 }
 
 note-form .title {
-  display: none;
+  visibility: hidden;
   font-size: 1.2em;
   font-weight: bold;
 }
