@@ -225,9 +225,13 @@ task-list-item .handle {
   cursor: grab;
 }
 
+task-list-item .checkbox {
+  padding: 0 4px;
+}
+
 task-list-item .checkbox input {
-  width: 1.1em;
-  height: 1.1em;
+  width: 1.3em;
+  height: 1.3em;
 }
 
 li.dragging {
