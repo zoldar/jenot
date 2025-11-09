@@ -145,6 +145,7 @@ editable-area textarea {
   font-size: inherit;
   font-family: inherit;
   line-height: inherit;
+  line-break: inherit;
   text-indent: inherit;
   letter-spacing: inherit;
   padding: 0;
@@ -224,9 +225,13 @@ task-list-item .handle {
   cursor: grab;
 }
 
+task-list-item .checkbox {
+  padding: 0 4px;
+}
+
 task-list-item .checkbox input {
-  width: 1.1em;
-  height: 1.1em;
+  width: 1.3em;
+  height: 1.3em;
 }
 
 li.dragging {
@@ -248,11 +253,11 @@ task-list ul {
 
 note-form:focus-within .title,
 note-form .title:has(.non-empty) {
-  display: block;
+  visibility: visible;
 }
 
 note-form .title {
-  display: none;
+  visibility: hidden;
   font-size: 1.2em;
   font-weight: bold;
 }

@@ -127,7 +127,7 @@ class EditableArea extends HTMLElement {
     });
 
     this.inputElement.addEventListener("blur", () => {
-      document.removeEventLitener("touchmove", onTouchMove);
+      document.removeEventListener("touchmove", onTouchMove);
     });
 
     new ResizeObserver(() => {
