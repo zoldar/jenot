@@ -54,6 +54,8 @@ const sync = async () => {
   Notes.saveStorage();
 };
 
+window.addEventListener("focus", sync);
+
 if (isLoggedIn) {
   setInterval(sync, 5000);
 }
@@ -76,7 +78,7 @@ if (!isLoggedIn) {
 if (notificationsAvailable()) {
   document.querySelector("#notifications-pane").classList.remove("hidden");
   const notificationsButton = document.querySelector("#enable-notifications");
-  const notificationsTestButton = document.querySelector("#test-notifications");
+  // const notificationsTestButton = document.querySelector("#test-notifications");
 
   if (!notificationsEnabled()) {
     notificationsButton.classList.remove("hidden");
@@ -85,11 +87,11 @@ if (notificationsAvailable()) {
     });
   }
 
-  notificationsTestButton.addEventListener("click", () => {
-    setTimeout(() => {
-      sendNotification("reminder", "This is a test reminder!");
-    }, 8000);
-  });
+  // notificationsTestButton.addEventListener("click", () => {
+  //   setTimeout(() => {
+  //     sendNotification("reminder", "This is a test reminder!");
+  //   }, 8000);
+  // });
 }
 
 // Search
