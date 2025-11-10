@@ -172,10 +172,6 @@ task-list ul {
   padding: 4px 0;
 }
 
-task-list li:has(.checkbox input:checked) {
-  order: 1;
-}
-
 task-list-item .remove {
   width: 3em;
 }

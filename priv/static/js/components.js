@@ -275,7 +275,12 @@ class TaskListItem extends HTMLElement {
     });
 
     this.checkboxElement.addEventListener("change", () =>
-      this.dispatchEvent(new Event("contentChange", { bubbles: true })),
+      this.dispatchEvent(
+        new CustomEvent("contentChange", {
+          bubbles: true,
+          detail: { operation: "toggle_task" },
+        }),
+      ),
     );
 
     // drag and drop events
@@ -299,7 +304,12 @@ class TaskListItem extends HTMLElement {
     this.parentNode.addEventListener("dragend", () => {
       this.parentNode.setAttribute("draggable", "false");
       this.parentNode.classList.remove("dragging");
-      this.dispatchEvent(new Event("contentChange", { bubbles: true }));
+      this.dispatchEvent(
+        new CustomEvent("contentChange", {
+          bubbles: true,
+          detail: { operation: "reorder_task" },
+        }),
+      );
     });
 
     this.parentNode.addEventListener("touchstart", (e) => {
@@ -361,6 +371,12 @@ class TaskListItem extends HTMLElement {
         }
         this.taskList.dragActiveElement = null;
         this.taskList.dragPlaceholder = null;
+        this.dispatchEvent(
+          new CustomEvent("contentChange", {
+            bubbles: true,
+            detail: { operation: "reorder_task" },
+          }),
+        );
       }
     });
 
@@ -385,12 +401,14 @@ class TaskListItem extends HTMLElement {
 
   get value() {
     return {
+      order: parseInt(this.dataset.order),
       content: this.contentElement.value,
       checked: !!this.checkboxElement.checked,
     };
   }
 
   set value(item) {
+    this.dataset.order = item.order;
     this.checkboxElement.checked = item.checked;
     this.contentElement.value = item.content;
   }
@@ -424,6 +442,8 @@ class TaskList extends HTMLElement {
   }
 
   connectedCallback() {
+    const that = this;
+
     this.listElement = this.querySelector("ul");
 
     this.addEventListener("removeTaskWithButton", (e) => {
@@ -490,6 +510,18 @@ class TaskList extends HTMLElement {
       }
     });
 
+    this.addEventListener("contentChange", (e) => {
+      const operation = e.detail?.operation;
+      if (operation === "toggle_task") {
+        that.value = that.value;
+      } else if (operation === "reorder_task") {
+        const tasks = this.#valueNoOrder().map((task, idx) => {
+          return { ...task, order: idx };
+        });
+        that.value = tasks;
+      }
+    });
+
     // drag and drop
     this.listElement.addEventListener("dragover", (e) => {
       e.preventDefault();
@@ -506,15 +538,30 @@ class TaskList extends HTMLElement {
   }
 
   get value() {
-    return Array.from(this.querySelectorAll("task-list-item")).map(
-      (item) => item.value,
-    );
+    const tasks = this.#valueNoOrder().sort((a, b) => a.order - b.order);
+
+    return tasks;
   }
 
   set value(tasks) {
+    const sortedTasks = [...tasks]
+      .map((task, idx) => {
+        return { ...task, order: idx };
+      })
+      .sort((a, b) => {
+        const maxOrder = Math.max(a.order, b.order) + 1;
+
+        return (
+          (a.checked ? maxOrder : 0) +
+          a.order -
+          b.order -
+          (b.checked ? maxOrder : 0)
+        );
+      });
+
     this.listElement.replaceChildren();
 
-    tasks.forEach((task) => {
+    sortedTasks.forEach((task) => {
       const item = html`
         <li><task-list-item></task-list-itm></li>
         `;
@@ -523,6 +570,12 @@ class TaskList extends HTMLElement {
     });
 
     this.dispatchEvent(new Event("contentChange", { bubbles: true }));
+  }
+
+  #valueNoOrder() {
+    return Array.from(this.querySelectorAll("task-list-item")).map(
+      (item) => item.value,
+    );
   }
 }
 
